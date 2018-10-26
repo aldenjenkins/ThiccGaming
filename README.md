@@ -1,12 +1,10 @@
 # ThiccGaming.com
-****
 
 This is the source code to the ThiccGaming web app.
 
 This stack includes: Docker-compose, Django, Sentry, Nginx, SteamCMD, MySQL (instead of postgres because I can integrate with game servers much easier,) Docker, Docker-compose, AWS S3, and AWS SES.
 
 ## Quick start
-****
 
 1. Create a virtual environment with `mkvirtualenv thicc` (requires [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) be installed)
 
@@ -27,13 +25,14 @@ This stack includes: Docker-compose, Django, Sentry, Nginx, SteamCMD, MySQL (ins
 
    __Search 'spam domain text files' on google to find great templates.__
 
-6. Run `python manage.py migrate` to create the models.
+5. _Docker time!_ install docker and docker-compose. run `docker-compose up` from the root folder.
 
-7. Start the development server with `python manage.py runserver`
-   and visit http://127.0.0.1:8000/
+6. visit http://localhost/ and notice how there is no port specified on that url. Docker is running
+NginX which is listening on port 80. 80 is the default port for all http traffic so this is the same
+thing as saying http://localhost:80. connecting to nginx will tell nginx to point your traffic to 
+the django app specified in the `nginx/conf.d/local.conf` file.
 
 ## Future Plans
-****
 
 * Make Thicc Bans its own package. Since it is a fully fledged custom Django ban sytem which integrates with sourcemod servers, it is the best
   competitor to sourcebans, and the only competitor which works with Django, removing the need to host any PHP on your stack.
