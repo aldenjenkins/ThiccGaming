@@ -24,7 +24,9 @@ Docker-compose makes the deployment for this very automatited and easy. There is
    __Search 'spam domain text files' on google to find great templates.__
 
 3. __Docker time!__ 
-  * Install [Docker](https://docs.docker.com/install/) and [Docker-compose](https://docs.docker.com/compose/install/). Run `docker-compose run django python manage.py migrate` from the main folder.
+  * Install [Docker](https://docs.docker.com/install/) and [Docker-compose](https://docs.docker.com/compose/install/). Run `docker-compose run django python manage.py migrate` from the main folder. 
+      docker-compose creates a volume on the host machine so this only needs to be run once instead of everytime we start the django container. This will also need to be run again every time
+      you create new migrations when you run `docker-compose run django python manage.py makemigrations`.
   * Run `docker-compose up` from the main folder.
 
 4. Visit http://localhost/ and notice how there is no port specified on that url. Docker-compose is running
