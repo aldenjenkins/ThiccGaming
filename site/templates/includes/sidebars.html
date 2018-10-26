@@ -1,0 +1,70 @@
+{% load i18n %}
+<section class="content-container">
+    <h3>{% trans 'Servers' %}</h3>
+    <ul class="side-server-list">
+        {% for server in game_info %}
+            <li data-serverid="{{ server.id }}" class="server-block">
+                {% if server.up %}
+                    {% if "Scape" in server.title %}
+                        <div class="server-status online">{% trans 'Online' %}</div>
+                        <div class="server-info">
+                            <div class="server-info-name"><a href="/scape/" data-tooltip="{% trans 'View the Portal Page' %}">{{ server.title|default:'Unknown' }}</a></div>
+                            <div class="server-info-players">{{ server.info.player_count|default:'0' }} / 500 </div>
+                        </div>
+                    {% else %}
+                        <div class="server-status online">{% trans 'Online' %}</div>
+                        <div class="server-info">
+                            <div class="server-info-name"><a href="steam://connect/{{ server.host }}:{{ server.port }}" rel="nofollow" data-tooltip="{% trans 'Connect to this server' %}">{{ server.title|default:'Unknown' }}</a></div>
+                            <div class="server-info-map">{{ server.info.map|default:'Unknown' }}</div>
+                            <div class="server-info-players">{{ server.info.player_count }} / {{ server.info.max_players|default:'0' }}</div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if "Scape" in server.title %}
+                        <div class="server-status online">{% trans 'Online' %}</div>
+                        <div class="server-info">
+                            <div class="server-info-name"><a href="/scape/" data-tooltip="{% trans 'View the Portal Page' %}">{{ server.title|default:'Unknown' }}</a></div>
+                            <div class="server-info-players">{{ server.info.player_count|default:'0' }} / 500 </div>
+                        </div>
+                    {% else %}
+                        <div class="server-status offline">{% trans 'Offline' %}</div>
+                        <div class="server-info">
+                            <div class="server-info-name">{{ server.title }}</div>
+                            <div class="server-info-map">{% trans 'N/A' %}</div>
+                            <div class="server-info-players">0 / 0</div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                <div class="clearfix"></div>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section class="content-container">
+
+<div id="ts3viewer_1105338" style="background-color:rgb(255, 255, 255); "> </div>
+
+<script src="https://static.tsviewer.com/short_expire/js/ts3viewer_loader.js"></script>
+<script>
+var ts3v_url_1 = "https://www.tsviewer.com/ts3viewer.php?ID=1105338&text=757575&text_size=12&text_family=6&text_s_color=000000&text_s_weight=normal&text_s_style=normal&text_s_variant=normal&text_s_decoration=none&text_i_color=&text_i_weight=normal&text_i_style=normal&text_i_variant=normal&text_i_decoration=none&text_c_color=&text_c_weight=normal&text_c_style=normal&text_c_variant=normal&text_c_decoration=none&text_u_color=000000&text_u_weight=normal&text_u_style=normal&text_u_variant=normal&text_u_decoration=none&text_s_color_h=&text_s_weight_h=bold&text_s_style_h=normal&text_s_variant_h=normal&text_s_decoration_h=none&text_i_color_h=000000&text_i_weight_h=bold&text_i_style_h=normal&text_i_variant_h=normal&text_i_decoration_h=none&text_c_color_h=&text_c_weight_h=normal&text_c_style_h=normal&text_c_variant_h=normal&text_c_decoration_h=none&text_u_color_h=&text_u_weight_h=bold&text_u_style_h=normal&text_u_variant_h=normal&text_u_decoration_h=none&iconset=default_mono_2014";
+ts3v_display.init(ts3v_url_1, 1105338, 100);
+</script>
+</section>
+
+
+<section class="content-container">
+    <h3>{% trans 'Donations' %}</h3>
+    <p>
+    {% trans 'Support us by donating to receive some awesome premium benefits on each of our servers!' %}
+    </p>
+    <ul>
+        <li><strong>{% trans 'Current Donations' %}:</strong> &#36;{{ donation_amount }}</li>
+        <li><strong>{% trans 'Monthly Goal' %}:</strong> &#36;{{ donation_max }}</li>
+    </ul>
+    <div class="progress" data-tooltip="{{ donation_percent }}% {% trans 'of goal reached' %}">
+        <div class="determinate" style="width: {{ donation_percent }}%"></div>
+    </div>
+    <p class="center-align"><a href="/donate/" class="btn waves-effect waves-light">Donate Now</a></p>
+</section>
+

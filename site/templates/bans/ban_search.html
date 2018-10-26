@@ -1,0 +1,60 @@
+{% extends "base-actual.html" %}
+{% load i18n static ban_tags %}
+{% block meta_title %}{% trans 'Search' %} | {% trans 'Bans' %}{% endblock %}
+
+{% block breadcrumb_menu %}
+    <div class="content-container no-padding">
+        <div class="breadcrumbs count-3">
+            <a href="{% url 'home' %}"><i class="fa fa-fw fa-home"></i></a>
+            <a href="{% url 'bans:index' %}">{% trans 'Bans' %}</a>
+            <a href="{% url 'bans:search' %}">{% trans 'Search' %}</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block main_content %}
+
+	<div class="content-container">
+
+        {% if not bans %}
+            <h3>No results found.</h3>
+        {% else %}
+
+            <h3>{{ count }} bans found{% if name %} for {{ name }}{% endif %}</h3>
+            {% include 'bans/ban_table.html' %}
+        {% endif %}
+    </div>
+
+{% spaceless %}
+    {% if bans.has_previous or bans.has_next %}
+        <ul class="pagination {{ text_align|default:'center-align' }}">
+            <li {% if not bans.has_previous %} class="disabled"{% endif %}>
+                <a href="{{ full_path }}{% if bans.has_previous %}&page={{ bans.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}{% else %}#{% endif %}">
+                    <i class="fa fa-fw fa-chevron-left"></i>
+                </a>
+            </li>
+            {% for page in bans.paginator.page_range %}
+                <li{% if page == bans.number %} class="active"{% endif %}>
+                    <a href="{{ full_path }}&page={{ page }}{% if querystring %}&{{ querystring }}{% endif %}">{{ page }}</a>
+                </li>
+            {% endfor %}
+            <li {% if not bans.has_next %} class="disabled"{% endif %}>
+                <a href="{{ full_path }}{% if bans.has_next %}&page={{ bans.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}{% else %}#{% endif %}">
+                    <i class="fa fa-fw fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+{% endspaceless %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function(){
+        $(".ban-row").click(function(){
+            $(this).next().toggle('fast');
+        });
+    });</script>
+{% endblock %}
+

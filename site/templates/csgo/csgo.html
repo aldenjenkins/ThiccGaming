@@ -1,0 +1,18 @@
+{% extends "base-actual.html" %}
+
+{% load i18n static %}
+
+{% block meta_title %}{% trans "CS:GO" %}{% endblock %}
+{% block title %}{% endblock %}
+
+{% block main_content %}
+
+    <div class="content-container">
+        <h4>{% trans 'Coming Soon' %}</h4>
+        <p class="no-padding-top">{% blocktrans %}Stay updated by joining our <a href = "http://steamcommunity.com/groups/FooBarGaming">Steam Group</a> to
+                                                  be notified when our upcoming servers open up! We will be having
+                                                  huge give aways and prizes for the first day of each server's
+                                                  opening, so staying connected is crucial.{% endblocktrans %}</p>
+    </div>
+
+{% endblock %}

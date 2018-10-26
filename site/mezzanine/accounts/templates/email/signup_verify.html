@@ -1,0 +1,6 @@
+{% load i18n accounts_tags %}
+{% block main %}
+<p>{% blocktrans %}Thanks for creating your FooBarGaming.com account.{% endblocktrans %}</p>
+<p>{% trans "Please use the link below to activate it." %}</p>
+<p><a href="https://{{ request.get_host }}{{ verify_url }}">https://{{ request.get_host }}{{ verify_url }}</a></p>
+{% endblock %}

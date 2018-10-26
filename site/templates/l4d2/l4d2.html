@@ -1,0 +1,214 @@
+{% extends "base-actual.html" %}
+
+{% load i18n static %}
+
+{% block meta_title %}{% trans "L4D2" %}{% endblock %}
+{% block title %}{% endblock %}
+
+{% block main_content %}
+    <div class="content-container">
+
+        {% if current_players == "None" %}
+            <h4>Online Players ({{ current_players|length }})</h4>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Score</th>
+                        <th>Duration</th>
+                    </tr>
+                    <tr>
+                        <td>None</td>
+                    </tr>
+
+        {% else %}
+            <h4>Online Players ({{ current_players|length }})</h4>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Score</th>
+                        <th>Duration</th>
+                    </tr>
+            {% for player in current_players %}
+                <tr>
+
+                    {# Give the player a custom color based on donor/staff #}
+
+                    {% if player.staff %}
+                        <td style = "color:#D02311 !important"><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                    {% else %}
+                        {% if player.donator %}
+                            <td style = "color:rgb(255,237,0)"><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                        {% else %}
+                            <td><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                        {% endif %}
+                    {% endif %}
+                    <td>{{ player.score }}</td>
+                    <td>{{ player.duration }}</td>
+
+                </tr>
+
+            {% endfor %}
+        {% endif %}
+
+        </table>
+
+    </div>
+    <div class="content-container">
+        <h3>{% trans "Commands and Mods" %}</h3>
+        <ul class="restyle-list list-items-mar-bottom list-mar-bottom description-list">
+            <li>
+                <dl>
+                    <dt class="text-highlight">!buy</dt>
+                    <dd>Access the buy menu. Usage: !buy [item] {example: fheal}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">!teams</dt>
+                    <dd>Change your team.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">!stuck</dt>
+                    <dd>Useful for multiple tanks causing spawns in walls. Abusing this command will result in an auto-ban</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">!third</dt>
+                    <dd>Enter third person mode.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">!takeover</dt>
+                    <dd>Take over a living bot when you die.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Multi-Tank</dt>
+                    <dd>Use the buy menu to purchase multiple tanks at a time.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Charger Steering</dt>
+                    <dd>Faster charging speed, charging for longer distances, and being able to move while charging will make you lethal.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Karma Charge</dt>
+                    <dd>Charge your victim into water or off of a high cliff to give them sweet karma.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Movable smoker</dt>
+                    <dd>Smoke and move your target.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                     <dt class="text-highlight">Jockey Jump</dt>
+                     <dd>Jump over ledges while jockeying your target to instantly kill them.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Boomer Bitch slap</dt>
+                    <dd>Slap targets over ledges for an instant kill</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Ghost Fly</dt>
+                    <dd>Hold R while spawning as an infected to fly around</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Self explode</dt>
+                    <dd>Hold R as a Boomer or Spitter to kill yourself.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Melee weapons in the saferoom</dt>
+                    <dd>Many melee weapons are spawned in the saferoom at the start of every round.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Unlimited Throwables</dt>
+                    <dd>You're going to need a lot of molotovs to rush.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Throwables while incapacitated</dt>
+                    <dd>Last chance at survival while downed. Throwing while down will cause you to lose your grenade.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Unlimited Ammo</dt>
+                    <dd>Excluding incendiary and explosive ammo, you won't need to reload.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Molotov Shove</dt>
+                    <dd>Melee infected while holding your molotov to ignite them.</dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+
+
+    <div class="content-container">
+        <h3>{% trans "Rush!" %}</h3>
+        <p>
+            {% blocktrans %}
+                FooBar Gaming Is L4D2's best rush server. Your goal is to get to the safe house / extraction as
+                fast as you can while keeping as many of your teammates alive as possible. Only a true pro's pro
+                can achieve the latter.
+            {% endblocktrans %}
+        </p>
+        <p>
+            {% blocktrans %}
+                We've provided you with tons of Melee Weapons at your spawn, infinite throwables on pick-up,
+                infinite ammo, quicker revive speed and the ability to buy any item you want using the !buy menu as
+                you receive more points throughout the round. The best way to get points is by helping your teammates
+                when they're down. The faster revive speed comes in handy here!
+            {% endblocktrans %}
+        </p>
+        <p>
+            {% blocktrans %}
+                But the infected have received an upgrade package too . . .
+            {% endblocktrans %}
+        </p>
+        <p>
+            {% blocktrans %}
+                On this server, Smokers can move while choking, Jockeys can jump while riding survivors, and
+                Chargers can change their direction while charging. This combination of mods to both teams makes for
+                arguably the most fun L4D2 server in the game!
+            {% endblocktrans %}
+        </p>
+        <p>
+            {% blocktrans %}
+                We hope you have a great time on our server, and ask that you consider donating to the community so
+                we can keep this server and others like it up and running!
+            {% endblocktrans %}
+        </p>
+        <p>
+            {% blocktrans %}
+                -Hankey
+            {% endblocktrans %}
+        </p>
+    </div>
+
+{% endblock %}

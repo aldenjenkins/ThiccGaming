@@ -1,0 +1,258 @@
+
+{% load i18n static ban_tags %}
+<table class="ban-table">
+    <tr class ="row table-header">
+        <th>Game</th>
+        <th>Player</th>
+        <th>Banned by</th>
+        <th>Duration</th>
+{#                    <th>Reason</th>#}
+    </tr>
+    {% for ban in bans %}
+         <tr class = "ban-row" style="cursor:pointer;">
+             <td>
+                 {# Game #}
+                 {% if ban.game == 1 %}
+                    <a href = "/l4d2"><img src="{{ STATIC_URL }}img/l4d2-logo.png" width = "30px"></a>
+                 {% elif ban.sid == 2 %}
+                    <a href = "/gmod"><img src="{{ STATIC_URL }}img/gmod-logo.png" width = "30px"></a>
+                 {% elif ban.game == 3 %}
+                    <a href = "/scape"><img src="{{ STATIC_URL }}img/rs-logo.png" width = "30px"></a>
+                 {% elif ban.game == 4 %}
+                    <a href = "/csgo"><img src="{{ STATIC_URL }}img/csgo-logo.png" width = "30px"></a>
+                 {% elif ban.game == 5 %}
+                    <a href = "/wow"><img src="{{ STATIC_URL }}img/wow-logo.png" width = "30px"></a>
+                 {% else %}
+                    <a href = "/scape"><img src="{{ STATIC_URL }}img/rs-logo.png" width = "30px"></a>
+                 {% endif %}
+             {# User Photo #}
+             {% if ban.user %}
+                 {% if ban.user.user.forum_profile.avatar and ban.user.user.forum_profile.show_avatar %}
+                        <a style = "float:right;" href="{% url 'djangobb:forum_profile' ban.user.user.username %}">
+                            <img src="{{ ban.user.user.forum_profile.avatar.url }}" width = "30px" alt="User Avatar" />
+                        </a>
+                {% else %}
+                    {% if forum_settings.GRAVATAR_SUPPORT and ban.user.user.forum_profile.show_avatar %}
+                            <a style = "float:right;" href="{% url 'djangobb:forum_profile' ban.user.user.username %}">
+                                <img src="{% gravatar ban.user.user.email %}" width = "30px" alt="User Avatar" />
+                            </a>
+                    {% endif %}
+                {% endif %}
+             {% endif %}
+             </td>
+             <td>
+                {% if ban.user %}
+                    <a href = {% url 'djangobb:forum_profile' ban.user.user.username %}>{{ ban.name }}</a>
+                {% else %}
+                    {{ ban.name }}
+                {% endif %}
+             </td>
+             {# Banned By #}
+             {% if ban.adminUser %}
+                 <td><a href = {% url 'djangobb:forum_profile' ban.adminUser.user %}>{{ ban.adminUser.user.username }}</a></td>
+             {% else %}
+                <td>Admin has since been removed</td>
+             {% endif %}
+             {# Duration #}
+             <td {% if ban.unbanned %} style = "background-color:gold;">{{ ban.length }} (U){% elif ban.expired and ban.length != "Permanent" %} style="background-color:lightgreen;">{{ ban.length }} (E){% elif ban.length == "Permanent" %} style = "background-color:lightcoral;">{{ ban.length }} {% else %} style = "background-color:lightsalmon;">{{ ban.length }}{% endif %}</td>
+             {# Reason #}
+{#                         <td>{{ ban.reason }}</td>#}
+         </tr>
+         <tr class="ban-info" style="display:none">
+                <td colspan="7" align="center" style="padding:0px">
+{#                                <div class="opener" style="padding-top: 0px; border-top: none; padding-bottom: 0px; border-bottom: none; overflow: hidden; visibility: hidden; zoom: 1; opacity: 1; height: 0px;">#}
+                    <div class="opener" style="padding-top: 0px; border-top: none; padding-bottom: 0px; border-bottom: none; overflow: hidden; visibility: visible; zoom: 1;">
+                        <table width="100%" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                <tr>
+                                    <td height="16" align="left" colspan="3">
+                                        <b>Ban Details</b>
+                                    </td>
+                                </tr>
+                                <tr align="left">
+                                    <td width="30%" height="16" >FooBar User Profile</td>
+                                    <td height="16" >
+                                        {% if ban.user %}
+                                            <a href = {% url 'djangobb:forum_profile' ban.user.user.username %}>{{ ban.user.user.username }}</a>
+                                        {% else %}
+                                            {{ ban.nouser }}
+                                        {% endif %}
+                                    </td>
+
+                                 <td width="30%" rowspan="15" >
+
+                                  <div class="ban-edit">
+                                    <ul>
+                                        {% if user.is_authenticated and user.is_staff %}
+                                            {% if not username == ban.user.user.username or user.is_superuser and not ban.unbanned and not ban.expired %}
+                                                {% if not ban.unbanned and not ban.expired %}
+                                                <li class = "controlpanel"><a><img src="{{ STATIC_URL }}img/bans/edit.png" border="0" alt="" style="vertical-align:middle"> Unban </a></li>
+                                                <div class="openme" style="display:none" >
+                                                    <form method="POST" class="post-form" action = "{% url 'bans:unban' bid=ban.bid %}">{% csrf_token %}
+                                                        <label for="id_ureason">Unban Reason</label>
+                                                        {{ unban_form.ureason }}
+                                                        <button style="width:100%; height:100%;" class="btn waves-light" type="submit">Submit Unban</button>
+                                                    </form>
+                                                </div>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            <li class = "controlpanel"><a><img src="{{ STATIC_URL }}img/bans/forbidden.png" border="0" alt="" style="vertical-align:middle"> Reban </a></li>
+                                            <div class="openme" style="display:none" >
+                                                <form method="POST" class="post-form" action = "{% url 'bans:reban' bid=ban.bid %}">{% csrf_token %}
+                                                    <label for="id_reason">New Ban Reason</label>
+                                                    {{ reban_form.reason }}
+                                                    <label for="id_length">New Ban Length</label>
+                                                    {{ reban_form.length }}
+                                                    <button style="width:100%; height:100%;" class="btn waves-light" type="submit">Reban User</button>
+                                                </form>
+                                            </div>
+                                            <li class = "controlpanel"><a><img src="{{ STATIC_URL }}img/bans/details.png" border="0" alt="" style="vertical-align:middle"> Add Comment </a></li>
+                                            <div class="openme" style="display:none" >
+                                                <form method="POST" class="post-form" action = "{% url 'bans:comment' bid=ban.bid %}">{% csrf_token %}
+                                                    <label for="id_reason">Comment</label>
+                                                    {{ comment_form.comment }}
+                                                    <button style="width:100%; height:100%;" class="btn waves-light" type="submit">Submit Comment</button>
+                                                </form>
+                                            </div>
+                                        {% endif %}
+                                        {% if not ban.expired %}
+                                            {% if user.is_authenticated %}
+                                                {% if username == ban.user.user.username %}
+                                                    <li><a href="/forum/{{ ban.topic }}/topic/add/?contest&id={{ ban.bid }}" target="_self">Contest your Ban</a></li>
+                                                {% else %}
+                                                    <br/>
+                                                    <li><s>Contest this Ban</s></li>
+                                                    <br/>
+                                                    <li>You can only contest your own bans. If this is your steam account being banned, be sure your steam account is linked to your FooBar Gaming account <a href = ""</li>
+                                                {% endif %}
+                                            {% else %}
+                                                <br/>
+                                                <li><s>Contest this Ban</s></li>
+                                                <br/>
+                                                <li>You can contest your own bans here by <a href = '/accounts/login/?next=/banss'>logging in.</a></li>
+                                            {% endif %}
+                                        {% else %}
+                                             <br/>
+                                            <li><s>Contest this Ban</s></li>
+                                            <br/>
+                                            <li>This ban has expired.</li>
+                                        {% endif %}
+                                    </ul>
+                                  </div>
+                                </td>
+                              </tr>
+                                <tr align="left">
+                                        <td width="20%" height="16" class="listtable_1">Total Bans</td>
+                                        <td height="16" class="listtable_1">{{ ban.totalBans }} <a href="{% url 'bans:search' %}?user={{ ban.authid }}">(search) </a></td>
+                                </tr>
+                              <tr align="left">
+                                <td width="20%" height="16">Steam ID</td>
+                                <td height="16">
+                                    {{ ban.steamID }}
+                                </td>
+                              </tr>
+                              <tr align="left">
+                                <td width="20%" height="16">Steam3 ID</td>
+                                <td height="16" >
+                                    <a href="http://steamcommunity.com/profiles/{{ ban.steam3 }}" target="_blank">{{ ban.steam3 }}</a>
+                                </td>
+                              </tr>
+                            <tr align="left">
+                                <td width="20%" height="16" >Steam Community</td>
+                                <td height="16" ><a href="http://steamcommunity.com/profiles/{{ ban.authid }}" target="_blank">{{ ban.authid }}</a></td>
+{#                                          </tr>#}
+{#                                           <tr align="left">#}
+{#                                            <td width="20%" height="16" class="listtable_1">IP address</td>#}
+{#                                            <td height="16" class="listtable_1">#}
+{#                                            <img src="images/country/us.jpg" alt="US" border="0" align="absmiddle">&nbsp;{{ ban.ip }}#}
+{#                                           </td>#}
+{#                                          </tr>#}
+                                    <tr align="left">
+                                        <td width="20%" height="16" class="listtable_1">Invoked on</td>
+                                        <td height="16" class="listtable_1">{{ ban.createdDate }}</td>
+                                    </tr>
+                                    <tr align="left">
+                                        <td width="20%" height="16" class="listtable_1">Ban length</td>
+                                        <td height="16" class="listtable_1">{{ ban.length }}</td>
+                                    </tr>
+                                    {% if ban.unbanned %}
+                                        <tr align="left" style = "background-color:gold">
+                                            <td width="20%" height="16" class="listtable_1">Unban reason</td>
+                                            <td height="16" class="listtable_1">
+                                                {{ ban.ureason }}
+                                            </td>
+                                        </tr>
+                                        <tr align="left" style = "background-color:gold">
+                                            <td width="20%" height="16" class="listtable_1">Unbanned by Admin</td>
+                                            <td height="16" class="listtable_1">
+                                                {% if ban.unbannedAdmin != "Admin has since been removed." %}
+                                                    <a href = "{% url 'djangobb:forum_profile' ban.unbannedAdmin.user %}">{{ ban.unbannedAdmin.user.username }}</a>
+                                                {% else %}
+                                                    Admin has since been removed.
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr align="left" style = "background-color:gold">
+                                            <td width="20%" height="16" class="listtable_1">Unbanned on</td>
+                                            <td height="16" class="listtable_1">
+                                                {{ ban.RemovedOn }}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr align="left">
+                                        <td width="20%" height="16" class="listtable_1">Expires on</td>
+                                        <td height="16" class="listtable_1">
+                                            {{ ban.endDate }}
+                                        </td>
+                                    </tr>
+                                    <tr align="left">
+                                        <td width="20%" height="16" class="listtable_1">Reason</td>
+                                        <td height="16" class="listtable_1">{{ ban.reason }}</td>
+                                    </tr>
+                                    <tr align="left">
+                                        <td width="20%" height="16" class="listtable_1">Banned by Admin</td>
+                                        <td height="16" class="listtable_1">
+                                            {% if ban.adminUser.user.forum_profile.avatar and ban.adminUser.user.forum_profile.show_avatar %}
+                                                <a href="{% url 'djangobb:forum_profile' ban.adminUser.user.username %}">
+                                                    <img src="{{ ban.adminUser.user.forum_profile.avatar.url }}" width = "20px" alt="User Avatar" />
+                                                </a>
+                                            {% else %}
+                                                {% if forum_settings.GRAVATAR_SUPPORT and ban.adminUser.user.forum_profile.show_avatar %}
+                                                        <a href="{% url 'djangobb:forum_profile' ban.adminUser.user.username %}">
+                                                            <img src="{% gravatar ban.adminUser.user.email %}" width = "20px" alt="User Avatar" />
+                                                        </a>
+                                                {% endif %}
+                                            {% endif %}
+                                            <a href = {% url 'djangobb:forum_profile' ban.adminUser.user %}>{{ ban.adminUser.user.username }}</a>
+                                        </td>
+                                    </tr>
+                                    <tr align="left">
+                                        <td width="20%" height="16" class="listtable_1">Banned from</td>
+                                        <td height="16" class="listtable_1" id="ban_server_11">{{ ban.game }}</td>
+                                    </tr>
+
+                                    {% if ban.commentss %}
+                                        <tr align="left">
+                                            <td width="20%" height="16" class="listtable_1">Comments</td>
+                                            <td height="16" class="listtable_1">
+
+                                                {% for comment in ban.commentss %}
+                                                    {{ comment }}
+                                                    <br/>
+                                                    <br/>
+                                                {% endfor %}
+{#                                                <p>You shouldnt see this</p>#}
+
+                                            </td>
+
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                    </div>
+                    </td>
+                </tr>
+    {% endfor %}
+
+</table>

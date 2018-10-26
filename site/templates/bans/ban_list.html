@@ -1,0 +1,117 @@
+{% extends "base-actual.html" %}
+{#{% extends 'djangobb_forum/base.html' %}#}
+{% load i18n static ban_tags %}
+
+{% block meta_title %}{% trans "Bans" %}{% endblock %}
+{% block title %}{% endblock %}
+
+{% block breadcrumb_menu %}
+    <div class="content-container no-padding">
+        <div class="breadcrumbs count-3">
+            <a href="{% url 'home' %}"><i class="fa fa-fw fa-home"></i></a>
+            <a href="{% url 'bans:index' %}">{% trans 'Bans' %}</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block main_content %}
+
+{#    {% block messages %}#}
+{#        {% if messages %}#}
+{#        <div id="messages">#}
+{#            {% for message in messages %}#}
+{#                <div class="message{% if message.tags %} {{ message.tags }}{% endif %}" role="alert">{{ message }}</div>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#        {% endif %}#}
+{#    {% endblock messages %}#}
+
+{#    <div>#}
+{#    <span style="font-size:2.5em;">Bans</span>#}
+{#    <span style="font-size:1.75em;float:right;">Page {{ bans.number }}</span>#}
+{#    </div>#}
+
+{#<span style="float:right">Page {{ bans.number }}</span>#}
+{% if user.is_authenticated and user.is_staff or user.is_superuser %}
+
+    <div style="margin:0px auto;"><a style="text-align:center" class="btn waves-light" href="{% url 'bans:ban' %}">Add Ban</a></div>
+{% endif %}
+    <div class="content-container">
+        <div style="background-color:lightgrey;">
+             <h3 style="float: left;">Bans</h3>
+            <h5 style="float: right;">Page {{ bans.number }}</h5>
+        </div>
+
+            <h5 style="text-align: center;">Now serving number {{ num_bans }}</h5>
+
+            {% include 'bans/ban_table.html' %}
+
+    </div>
+
+
+    {% if bans.has_previous or bans.has_next %}
+        <ul class="pagination {{ text_align|default:'center-align' }}">
+            <li {% if not bans.has_previous %} class="disabled"{% endif %}>
+                <a href="{% if bans.has_previous %}?page={{ bans.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}{% else %}#{% endif %}">
+                    <i class="fa fa-fw fa-chevron-left"></i>
+                </a>
+            </li>
+
+            <li{% if bans.number == 1%} class="active"{% endif %}>
+                <a href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">1</a>
+            </li>
+            <li{% if bans.number == 2 %} class="active"{% endif %}>
+                <a href="?page=2{% if querystring %}&{{ querystring }}{% endif %}">2</a>
+            </li>
+            <li{% if bans.number == 3 %} class="active"{% endif %}>
+                <a href="?page=3{% if querystring %}&{{ querystring }}{% endif %}">3</a>
+            </li>
+            <li>
+                <p>...</p>
+            </li>
+            <li{% if bans.number == bans.paginator.page_range|length %} class="active"{% endif %}>
+                <a href="?page={{ bans.paginator.page_range|length }}{% if querystring %}&{{ querystring }}{% endif %}">{{ bans.paginator.page_range|length }}</a>
+            </li>
+
+
+            <li {% if not bans.has_next %} class="disabled"{% endif %}>
+                <a href="{% if bans.has_next %}?page={{ bans.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}{% else %}#{% endif %}">
+                    <i class="fa fa-fw fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+{##}
+{#<script>#}
+{#$(document).ready(function(){#}
+{##}
+{#$("html").hide();#}
+{##}
+{# });#}
+{##}
+{#​</script>#}
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        $(document).ready(function(){
+            $(".ban-row").click(function(){
+                $(this).next().toggle('fast');
+
+            });
+            $(".controlpanel").click(function(){
+                $(this).next(".openme").toggle('fast');
+            });
+
+        });
+    </script>
+{#    {% if user.is_authenticated and user.is_superuser %}#}
+{#    <script>#}
+{#        $(document).ready(function(){#}
+{#            $("#unban").click(function(){#}
+{#                $(this).next().toggle('fast');#}
+{#            });#}
+{#        });#}
+{#    </script>#}
+{#{% endif %}#}
+{% endblock %}

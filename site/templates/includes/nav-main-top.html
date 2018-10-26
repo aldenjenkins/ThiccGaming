@@ -1,0 +1,43 @@
+{% load i18n pages_tags %}
+<div id="nav-main-container">
+    <nav id="nav-main">
+        <div class="nav-wrapper">
+            <div class="container">
+                <a href="#" data-activates="nav-main-side" class="button-collapse" id="main-nav-bar-button-collapse"><i class="fa fa-fw fa-bars"></i><span> Menu</span></a>
+                <span id="nav-main-bar-brand">
+                    FooBar<br />
+                    Gaming
+                </span>
+                <ul id="nav-main-bar" class="hide-on-med-and-down menu-border-effect">
+                    {% page_menu 'pages/menus/dropdown.html' %}
+                </ul>
+                <form id="nav-main-search" action="{% url 'djangobb:search' %}" method="GET">
+                    <div class="input-field">
+                        <input id="main-nav-search-input" type="search" name="keywords" placeholder="Search..." required>
+                        <label for="main-nav-search-input"><i class="fa fa-fw fa-search fa-2x"></i></label>
+                        <i id="nav-main-bar-button-search-close" class="material-icons fa fa-fw fa-times fa-lg"></i>
+                    </div>
+                    <input type="hidden" name="action" value="search" />
+                </form>
+                <ul class="right menu-border-effect">
+                    {% if request.user.is_authenticated %}
+                        <li {% for message in message_list %} {% if message.new %} style="background-color:red;" {% endif %} {% endfor %} class="hide-on-med-and-down">
+                            <a class="dropdown-button" href="#" data-activates="main_nav_profile_dd">{% trans 'Profile' %}<i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="main_nav_profile_dd" class="dropdown-content nav-main-bar-dropdown">
+                                <li {% for message in message_list %} {% if message.new %} style="background-color:red;" {% endif %} {% endfor %}><a href="{% url 'messages_inbox' %}"><i class="fa fa-fw fa-sm fa-envelope"></i>{% trans 'Messages' %}</a></li>
+                                <li><a href="{% url 'djangobb:search' %}?action=show_user&amp;show_as=topics"><i class="fa fa-fw fa-sm fa-file-text"></i>{% trans 'My Topics' %}</a></li>
+                                <li><a href="{% url 'djangobb:search' %}?action=show_user&amp;show_as=posts"><i class="fa fa-fw fa-sm fa-comment"></i>{% trans 'My Posts' %}</a></li>
+                                <li><a href="{% url 'djangobb:forum_profile' user.username %}"><i class="fa fa-fw fa-sm fa-cog"></i>{% trans 'Settings' %}</a></li>
+                            </ul>
+                        </li>
+                        <li class="hide-on-med-and-down"><a href="{% url 'logout' %}?next={{ request.path }}">{% trans 'Log Out' %}</a></li>
+                    {% else %}
+                        <li class="hide-on-med-and-down"><a href="{% url 'login' %}?next={{ request.path }}">{% trans 'Log In' %}</a></li>
+                        <li class="hide-on-med-and-down"><a href="{% url 'signup' %}?next={{ request.path }}">{% trans 'Register' %}</a></li>
+                    {% endif %}
+                    <li><a href="#" id="nav-main-bar-button-search"><i class="fa fa-fw fa-search"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>

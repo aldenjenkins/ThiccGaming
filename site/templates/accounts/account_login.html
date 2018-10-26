@@ -1,0 +1,50 @@
+{% extends "accounts/account_form.html" %}
+{% load i18n static mezzanine_tags social_auth_filter %}
+
+{% block breadcrumb_menu %}{% endblock %}
+{% block body_id %}account signup{% endblock %}
+
+{% block main_content %}
+    {% if request.user.is_authenticated %}
+        <div class="content-container">
+            <h3>{% trans 'Log in' %}</h3>
+            <p>{% trans "You're already logged in. If you'd like to log in as a different user, you'll need to log out first." %}</p>
+        </div>
+    {% else %}
+       <div class="row">
+            <div class="col s12 m8">
+                <div class="content-container">
+                    <h3>{% trans 'Log in' %}</h3>
+                    {% errors_for form %}
+                    <form method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                        {% fields_for form %}
+                        <div class="form-actions">
+                            {% block account_form_actions %}
+                                <button class="btn" type="submit">{{ title }}</button>
+                                {% url "mezzanine_password_reset" as password_reset_url %}
+                                {% url "profile_update" as profile_update_url %}
+                                <a href="{{ password_reset_url }}?next={{ profile_update_url }}" class="btn-flat">{% trans 'Forgot your password?' %}</a>
+                            {% endblock %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="content-container">
+                    <h4>{% trans 'Or, log in with' %}</h4>
+                    {% for backend in backends.backends %}
+                        <a href="{% url 'social:begin' backend %}" class="btn btn-auth btn-auth-{{ backend|social_display_name|lower }}">
+                            <i class="fa fa-{{ backend|social_display_name|lower }}"></i>
+                            {{ backend|social_display_name }}
+                        </a>
+                    {% endfor %}
+{#                         <a href="{% url 'social:begin' 'steam' %}" class="btn btn-auth btn-auth-steam">#}
+{#                            <i class="fa fa-stean"></i>#}
+{#                            Steam#}
+{#                        </a>#}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+

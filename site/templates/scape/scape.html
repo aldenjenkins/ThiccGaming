@@ -1,0 +1,158 @@
+{% extends "base-actual.html" %}
+
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Scape" %}{% endblock %}
+{% block title %}{% endblock %}
+
+{% block main_content %}
+
+{#    <div class="content-container">#}
+{#        <h4>{% trans 'Coming Soon' %}</h4>#}
+{#        <p class="no-padding-top">{% blocktrans %}Stay updated by joining our <a href = "http://steamcommunity.com/groups/FooBarGaming">Steam Group</a> to#}
+{#                                                  be notified when our upcoming servers open up! We will be having#}
+{#                                                  huge give aways and prizes for the first day of each servers'#}
+{#                                                  opening, so staying connected is crucial.{% endblocktrans %}</p>#}
+{#    </div>#}
+
+
+
+
+{#        <form action="{{ form.get_endpoint }}" method="post">#}
+{#            {% csrf_token %}#}
+{#            {{ form.business }}#}
+{#            {{ form.item_name }}#}
+{#            {{ form.notify_url }}#}
+{#            {{ form.return_url }}#}
+{#            {{ form.custom }}#}
+{#            {{ form.invoice }}#}
+{#            {{ form.cmd }}#}
+{#            {{ form.charset }}#}
+{#            {{ form.currency_code }}#}
+{#            {{ form.no_shipping }}#}
+{#            <input type="hidden" name="amount" value="{{ value }}" />#}
+
+            <div class="content-container">
+{#                <a href = "/rsps"><h4 style="text-align: center">{% trans 'Download here' %}</h4></a>#}
+                {% if user.is_authenticated and steam %}
+                    <form method="get" action="../static/media/FooBarScape.jar">
+                        <button style="display: block;margin-left: auto;margin-right: auto;" data-target="modal-rsps" class="btn waves-effect waves-light center"><i class="fa fa-fw fa-download fa-sm"></i>&nbsp;Download Client</button>
+                    </form>
+                {% else %}
+                    <button style="display: block;margin-left: auto;margin-right: auto;" data-target="modal-rsps" class="btn modal-trigger"><i class="fa fa-fw fa-download fa-sm"></i>&nbsp;Download Client</button>
+                {% endif %}
+                <p class="no-padding-bottom" style="text-align:center">
+                    {% blocktrans %}
+                        By downloading our client, you are agreeing to our <a href = "/rules/">community-wide server rules</a>, and understand that <a href = "/bans/">punishment</a> on one server applies to all of our servers.
+                    {% endblocktrans %}
+                </p>
+            </div>
+
+
+
+            <div class="content-container">
+{#                <a href = "/rsps"><h4 style="text-align: center">{% trans 'Vote here' %}</h4></a>#}
+
+                <button style="display: block;margin-left: auto;margin-right: auto;" class="btn waves-effect waves-light center"><i class="fa fa-fw fa-thumbs-up fa-sm"></i>&nbsp;Vote</button>
+
+                <p class="no-padding-bottom" style="text-align:center">{% blocktrans %}Voting gives you additional benefits in-game!{% endblocktrans %}</p>
+            </div>
+
+{#        </form>#}
+        <div class="content-container">
+
+            {% if current_players == "None" %}
+                <h4>Online Players ({{ current_players|length }})</h4>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Duration</th>
+                        </tr>
+                                <tr>
+                                    <td>None</td>
+                                </tr>
+
+            {% else %}
+                <h4>Online Players ({{ current_players|length }})</h4>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Duration</th>
+                        </tr>
+                {% for player in current_players %}
+                    <tr>
+
+                            {# Give the player a custom color based on donor/staff #}
+
+                        {% if player.staff %}
+                            <td style = "color:#D02311 !important"><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                        {% else %}
+                            {% if player.donator %}
+                                <td style = "color:rgb(255,237,0)"><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                            {% else %}
+                                <td><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                            {% endif %}
+                        {% endif %}
+
+                        <td>{{ player.duration }}</td>
+
+                    </tr>
+
+                {% endfor %}
+            {% endif %}
+
+            </table>
+
+        </div>
+
+        <div class="content-container">
+            <h4>{% trans 'FooBar Scape Funserver' %}</h4>
+            {% blocktrans %}
+                <p class="no-padding-top">
+                        FooBarScape is our Custom RSPS made for Questing, PKing, Skilling, and everything in-between.
+                        Make it your own by leveling up at your own rate with our custom commands, which allow you
+                        access to as many or as little items and skills as you want. Our server offers a huge variety of quests,
+                        and one of the largest working sets of usable skills, including Summoning.
+                </p>
+                                                                <hr>
+                 <p class="no-padding-top">
+                        Be sure to vote daily, as we keep track of the amount of votes you make and give you benefits ingame! But nothing
+                        beats the <a href = "/donate/">donator benefits</a> we offer.
+
+                </p>
+            {% endblocktrans %}
+        </div>
+
+
+
+
+    {% if not steam and user.is_authenticated %}
+        <div id="modal-rsps" class="modal">
+            <div class="modal-content" style="padding-bottom: 0;">
+                <h4>{% trans 'Link your account with Steam' %}</h4>
+                <p>{% blocktrans %}Our ban system is fully automated, so in order for you to access our servers you must login with the steam account linked to your website account. You can simply associate your Steam account by signing in with Steam using the button below.{% endblocktrans %}</p>
+                <p class="center-align mar-top pad-top"><a href="{% url 'social:begin' 'steam' %}?next={{ request.path }}" class="btn btn-auth btn-auth-steam"><i class="fa fa-steam"></i>steam</a></p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-action modal-close btn-flat">{% trans 'Cancel' %}</button>
+            </div>
+        </div>
+    {% elif user.is_anonymous %}
+        <div id="modal-rsps" class="modal">
+            <div class="modal-content" style="padding-bottom: 0;">
+                <h4>{% trans 'Log In Required' %}</h4>
+                <p>{% blocktrans %}Our FooBar Scape Server login system is fully linked to our website to allow users to access features throughout different servers, so in order for you to be able to login through the client you will need to have an account created on FooBarGaming.com. Luckily, you can simply register an account using the button below.{% endblocktrans %}</p>
+                <p class="center-align mar-top pad-top" style="margin-bottom:0;" >
+                    <a class="btn" href="{% url 'login' %}?next={{ request.path }}">{% trans 'Log In' %}</a>&nbsp;&nbsp;&nbsp;
+                    <a class="btn" href="{% url 'signup' %}?next={{ request.path }}">{% trans 'Register' %}</a>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-action modal-close btn-flat">{% trans 'Cancel' %}</button>
+            </div>
+        </div>
+    {% endif %}
+
+
+
+{% endblock %}

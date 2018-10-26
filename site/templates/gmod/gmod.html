@@ -1,0 +1,71 @@
+{% extends "base-actual.html" %}
+
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Garry's Mod" %}{% endblock %}
+{% block title %}{% endblock %}
+
+{% block main_content %}
+
+{#    <div class="content-container">#}
+{#        <h4>{% trans 'Coming Soon' %}</h4>#}
+{#        <p class="no-padding-top">{% blocktrans %}Stay updated by joining our <a href = "http://steamcommunity.com/groups/FooBarGaming">Steam Group</a> to#}
+{#                                                  be notified when our upcoming servers open up! We will be having#}
+{#                                                  huge give aways and prizes for the first day of each servers'#}
+{#                                                  opening, so staying connected is crucial.{% endblocktrans %}#}
+{#        </p>#}
+{#    </div>#}
+
+
+
+
+    <div class="content-container">
+
+        {% if current_players == "None" %}
+            <h4>Online Players ({{ current_players|length }})</h4>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Score</th>
+                        <th>Duration</th>
+                    </tr>
+                    <tr>
+                        <td>None</td>
+                    </tr>
+        {% else %}
+            <h4>Online Players ({{ current_players|length }})</h4>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Score</th>
+                        <th>Duration</th>
+                    </tr>
+            {% for player in current_players %}
+                <tr>
+
+                        {# Give the player a custom color based on donor/staff #}
+
+                    {% if player.staff %}
+                        <td style = "color:#D02311 !important"><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                    {% else %}
+                        {% if player.donator %}
+                            <td style = "color:rgb(255,237,0)"><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                        {% else %}
+                            <td><a href = /forum/user/{{ player.name }}/>{{ player.name }}</a></td>
+                        {% endif %}
+                    {% endif %}
+                    <td>{{ player.score }}</td>
+                    <td>{{ player.duration }}</td>
+
+                </tr>
+
+            {% endfor %}
+        {% endif %}
+
+        </table>
+
+    </div>
+
+
+
+{% endblock %}

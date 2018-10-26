@@ -1,0 +1,62 @@
+{% extends "accounts/account_form.html" %}
+{% load i18n static mezzanine_tags social_auth_filter %}
+
+{% block breadcrumb_menu %}{% endblock %}
+{% block body_id %}account signup{% endblock %}
+
+{% block main_content %}
+
+    {# If user is logged in, notify them that they are already logged in #}
+    {% if request.user.is_authenticated %}
+        <div class="content-container">
+            <h3>{% trans 'Create an account' %}</h3>
+            <p>{% trans "You're already logged in. If you'd like to create a new account, you'll need to log out first." %}</p>
+        </div>
+
+    {# If user is not logged in, allow them to create an accout #}
+    {% else %}
+       <div class="row">
+            <div class="col s12 m8" style="width: 100%;">
+                <div class="content-container">
+                    <h3>{% trans 'Create an account' %}</h3>
+
+                    {% errors_for form %}
+                    <form method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                        {% fields_for form %}
+                        <div class="form-actions">
+                            {% block account_form_actions %}
+                                <button class="btn" type="submit">{{ title }}</button>
+                            {% endblock %}
+                        </div>
+                    </form>
+
+                    {# If the account needs approval, tell the user #}
+                    {% if settings.ACCOUNTS_APPROVAL_REQUIRED %}
+                        <p>{% trans "After signing up, your account will be reviewed for approval. You'll receive an email when your account is activated." %}</p>
+
+                    {# If the account needs email verification, tell the user #}
+                    {% elif settings.ACCOUNTS_VERIFICATION_REQUIRED %}
+                        <p>{% trans "After signing up, you'll receive an email with a link you need to click in order to activate your account." %}</p>
+                    {% endif %}
+                </div>
+            </div>
+{#            <div class="col s12 m4">#}
+{#                <div class="content-container">#}
+{#                    <h4>{% trans 'Or, signup with' %}</h4>#}
+{##}
+                    {# For each social auth, show it as its own link with its previously specified attributes #}
+{#                    {% for backend in backends.backends %}#}
+{#                        <a href="{% url 'social:begin' backend %}" class="btn btn-auth btn-auth-{{ backend|social_display_name|lower }}">#}
+{#                            <i class="fa fa-{{ backend|social_display_name|lower }}"></i>#}
+{#                            {{ backend|social_display_name }}#}
+{#                        </a> #}
+{#                    {% endfor %}#}
+{#                </div>#}
+{#            </div>#}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>  
+{% endblock %}

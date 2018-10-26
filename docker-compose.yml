@@ -1,0 +1,60 @@
+version: "3.3"
+
+services:
+
+  nginx:
+    restart: always
+    image: nginx:1.13
+    container_name: nginx-container
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - django
+    networks:
+      - nginx_network
+
+  django:
+    build: ./site/
+    env_file: ./site/environment.env
+    volumes:
+      - ./site/:/opt/services/thiccsite/src
+    depends_on: 
+     - mysql1
+    networks:
+     - nginx_network
+     - mysql_network
+
+  mysql1:
+    restart: always
+    build: ./mysql/
+    volumes:
+      - /data/:/var/lib/mysql
+    env_file:
+      - ./mysql/environment.env
+    expose:
+      - "3306"
+    networks:
+      - mysql_network
+
+#  l4d2:
+#    build: ./game-servers/l4d2
+#    volumes: 
+#      - ./l4d2/cfg:/opt/services/l4d2/left4dead2/cfg
+#      - ./l4d2/addons:/opt/services/l4d2/left4dead2/addons
+#    restart: always
+#    networks:
+#      - nginx_network
+#      - mysql_network
+
+networks:
+  nginx_network:
+    driver: bridge
+  mysql_network:
+    driver: bridge
+
+# volumes:
+#   mysql1_volume:
+#   l4d2_volume:

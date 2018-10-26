@@ -1,0 +1,375 @@
+{% extends "base-actual.html" %}
+
+{% load i18n static %}
+
+{% block meta_title %}{% trans "About" %}{% endblock %}
+{% block title %}{% endblock %}
+
+{% block main_content %}
+
+<div class="content-container">
+         <h3>BB Code Markup</h3>
+        <p>The following BBCodes can be used on our forum for enhanced styling and usability.</p>
+     </div>
+      <div class="content-container">
+
+
+            <div class="bbCode">
+               <h3 class="title">[B], [I], [U], [S] - Bold, Italics, Underline, and Strike-through</h3>
+               <p class="description">Makes the wrapped text bold, italic, underlined, or struck-through.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>This is [B]bold[/B] text.<br>
+                     This is [I]italic[/I] text.<br>
+                     This is [U]underlined[/U] text.<br>
+                     This is [S]struck-through[/S] text.
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">This is <b>bold</b> text.<br>
+                     This is <i>italic</i> text.<br>
+                     This is <span style="text-decoration: underline">underlined</span> text.<br>
+                     This is <span style="text-decoration: line-through">struck-through</span> text.
+                  </dd>
+               </dl>
+            </div>
+         </div>
+<div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[COLOR=<span class="option">color</span>], [FONT=<span class="option">name</span>], [SIZE=<span class="option">size</span>] - Text Color, Font, and Size</h3>
+               <p class="description">Changes the color, font, or size of the wrapped text.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>This is [COLOR=red]red[/COLOR] and [COLOR=#0000cc]blue[/COLOR] text.<br>
+                     This is [FONT=Courier New]Courier New[/FONT] text.<br>
+                     This is [SIZE=1]small[/SIZE] and [SIZE=7]big[/SIZE] text.
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">This is <span style="color: red">red</span> and <span style="color: #0000cc">blue</span> text.<br>
+                     This is <span style="font-family: 'Courier New'">Courier New</span> text.<br>
+                     This is <span style="font-size: 9px">small</span> and <span style="font-size: 26px">big</span> text.
+                  </dd>
+               </dl>
+            </div>
+
+</div>
+<div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[URL], [EMAIL] - Linking</h3>
+               <p class="description">Creates a link using the wrapped text as the target.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[URL]http://www.example.com[/URL]<br>
+                     [EMAIL]example@example.com[/EMAIL]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml"><a href="http://www.example.com" target="_blank" class="externalLink" rel="nofollow">http://www.example.com</a><br>
+                     <a href="mailto:example@example.com">example@example.com</a>
+                  </dd>
+               </dl>
+            </div>
+
+</div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[URL=<span class="option">link</span>], [EMAIL=<span class="option">address</span>] - Linking (Advanced)</h3>
+               <p class="description">Links the wrapped text to the specified web page or email address.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[URL=http://www.example.com]Go to example.com[/URL]<br>
+                     [EMAIL=example@example.com]Email me[/EMAIL]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml"><a href="http://www.example.com" target="_blank" class="externalLink" rel="nofollow">Go to example.com</a><br>
+                     <a href="mailto:example@example.com">Email me</a>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[USER=<span class="option">ID</span>] - Profile Linking</h3>
+               <p class="description">Links to a user's profile. This is generally inserted automatically when tagging a user.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[USER=1]User Name[/USER]</dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml"><a href="https://www.foobargaming.com/" class="username" data-user="1, User Name">User Name</a></dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[IMG] - Image</h3>
+               <p class="description">Display an image, using the wrapped text as the URL.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+{#                  <dd>[IMG]https://www.exiledservers.net/​styles/brivium/stylium/vanadium​/xenforo/avatars/avatar_s.png[/IMG]</dd>#}
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+{#                  <dd class="baseHtml"><img src="https://www.exiledservers.net/styles/brivium/stylium/vanadium/xenforo/avatars/avatar_s.png" class="bbCodeImage LbImage" alt="[​IMG]" data-url="https://www.exiledservers.net/styles/brivium/stylium/vanadium/xenforo/avatars/avatar_s.png" style=""></dd>#}
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[MEDIA=<span class="option">site</span>] - Embedded Media</h3>
+               <p class="description">Embeds media from approved sites into your message. It is recommended that you use the media button in the editor tool bar. Approved sites:
+                  <a href="http://www.dailymotion.com" target="_blank" rel="nofollow">Dailymotion</a>;
+                  <a href="http://www.facebook.com" target="_blank" rel="nofollow">Facebook</a>;
+                  <a href="http://www.liveleak.com" target="_blank" rel="nofollow">Liveleak</a>;
+                  <a href="http://www.metacafe.com" target="_blank" rel="nofollow">Metacafe</a>;
+                  <a href="http://www.vimeo.com" target="_blank" rel="nofollow">Vimeo</a>;
+                  <a href="http://www.youtube.com" target="_blank" rel="nofollow">YouTube</a>;
+               </p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>
+                     [MEDIA=youtube]oHg5SJYRHA0[/MEDIA]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     <i>An embedded YouTube player would appear here.</i>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[LIST] - Lists</h3>
+               <p class="description">Displays a bulleted or numbered list.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[LIST]<br>
+                     [*]Bullet 1<br>
+                     [*]Bullet 2<br>
+                     [/LIST]<br>
+                     [LIST=1]<br>
+                     [*]Entry 1<br>
+                     [*]Entry 2<br>
+                     [/LIST]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     <ul>
+                        <li>Bullet 1</li>
+                        <li>Bullet 2</li>
+                     </ul>
+                     <ol>
+                        <li>Entry 1</li>
+                        <li>Entry 2</li>
+                     </ol>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[LEFT], [CENTER], [RIGHT] - Text Alignment</h3>
+               <p class="description">Changes the alignment of the wrapped text.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[LEFT]Left-aligned[/LEFT]<br>
+                     [CENTER]Center-aligned[/CENTER]<br>
+                     [RIGHT]Right-aligned[/RIGHT]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     <div style="text-align: left">Left-aligned​</div>
+                     <div style="text-align: center">Center-aligned​</div>
+                     <div style="text-align: right">Right-aligned​</div>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[QUOTE] - Quoted Text</h3>
+               <p class="description">Displays text that has been quoted from another source. You may also attribute the name of the source.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[QUOTE]Quoted text[/QUOTE]<br>
+                     [QUOTE=A person]Something they said[/QUOTE]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     <div class="bbCodeBlock bbCodeQuote">
+                        <aside>
+                           <blockquote class="quoteContainer">
+                              <div class="quote">Quoted text</div>
+                              <div class="quoteExpand">Click to expand...</div>
+                           </blockquote>
+                        </aside>
+                     </div>
+                     <div class="bbCodeBlock bbCodeQuote" data-author="A person">
+                        <aside>
+                           <div class="attribution type">A person said:</div>
+                           <blockquote class="quoteContainer">
+                              <div class="quote">Something they said</div>
+                              <div class="quoteExpand">Click to expand...</div>
+                           </blockquote>
+                        </aside>
+                     </div>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[SPOILER] - Text Containing Spoilers</h3>
+               <p class="description">Hides text that may contain spoilers so that it must be clicked by the viewer to be seen.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[SPOILER]Simple spoiler[/SPOILER]<br>
+                     [SPOILER=Spoiler Title]Spoiler with a title[/SPOILER]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     <div class="ToggleTriggerAnchor bbCodeSpoilerContainer">
+                        <button type="button" class="button bbCodeSpoilerButton ToggleTrigger Tooltip JsOnly" data-target="> .SpoilerTarget"><span>Spoiler</span></button>
+                        <div class="SpoilerTarget bbCodeSpoilerText">Simple spoiler</div>
+                     </div>
+                     <div class="ToggleTriggerAnchor bbCodeSpoilerContainer">
+                        <button type="button" class="button bbCodeSpoilerButton ToggleTrigger Tooltip JsOnly" data-target="> .SpoilerTarget"><span>Spoiler: <span class="SpoilerTitle">Spoiler Title</span></span></button>
+                        <div class="SpoilerTarget bbCodeSpoilerText">Spoiler with a title</div>
+                     </div>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[CODE], [PHP], [HTML] - Programming Code Display</h3>
+               <p class="description">Displays text in one of several programming languages, highlighting the syntax where possible.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[CODE]General<br>
+                     code[/CODE]<br>
+                     [PHP]echo $hello . 'world';[/PHP]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     <div class="bbCodeBlock bbCodeCode">
+                        <div class="type">Code:</div>
+                        <pre>General
+code</pre>
+                     </div>
+                     <div class="bbCodeBlock bbCodePHP">
+                        <div class="type">PHP:</div>
+                        <div class="code"><code><span style="color: #000000">
+                           <span style="color: #0000BB"></span><span style="color: #007700">echo&nbsp;</span><span style="color: #0000BB">$hello&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #DD0000">'world'</span><span style="color: #007700">;</span>
+                           </span>
+                           </code>
+                        </div>
+                     </div>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[INDENT] - Text Indent</h3>
+               <p class="description">Indents the wrapped text. This can be nested for larger indentings.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>Regular text<br>
+                     [INDENT]Indented text<br>
+                     [INDENT]More indented[/INDENT]<br>
+                     [/INDENT]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     Regular text<br>
+                     <div style="padding-left: 30px">
+                        Indented text<br>
+                        <div style="padding-left: 30px">More indented​</div>
+                     </div>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[PLAIN] - Plain Text</h3>
+               <p class="description">Disables BB code translation on the wrapped text.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>[PLAIN]This is not [B]bold[/B] text.[/PLAIN]</dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">This is not [B]bold[/B] text.</dd>
+               </dl>
+            </div>
+         </li>
+  </div>
+  <div class="content-container">
+
+            <div class="bbCode">
+               <h3 class="title">[ATTACH] - Attachment Insertion</h3>
+               <p class="description">Inserts an attachment at the specified point. If the attachment is an image, a thumbnail or full size version will be inserted. This will generally be inserted by clicking the appropriate button.</p>
+               <dl class="example">
+                  <dt>Example:</dt>
+                  <dd>
+                     Thumbnail: [ATTACH]123[/ATTACH]<br>
+                     Full Size: [ATTACH=full]123[/ATTACH]
+                  </dd>
+               </dl>
+               <dl class="output">
+                  <dt>Output:</dt>
+                  <dd class="baseHtml">
+                     <i>The contents of the attachments would appear here.</i>
+                  </dd>
+               </dl>
+            </div>
+
+  </div>
+
+{% endblock %}

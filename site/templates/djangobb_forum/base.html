@@ -1,0 +1,188 @@
+{% extends 'base-actual.html' %}
+{% load forum_extras %}
+{% load i18n %}
+{% load pages_tags mezzanine_tags i18n staticfiles %}
+
+{% block meta_keywords %}{% endblock %}
+{% block meta_description %}{% endblock %}
+{% block meta_title %}{% trans 'Forums' %}{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link type="text/css" rel="stylesheet" href="{% static 'djangobb_forum/css/pygments.css' %}" />
+{% endblock %}
+{% block extra_js %}
+    {{ block.super }}
+
+    {% if user.is_authenticated %}
+        {% if post %}
+            {% with markup=post.markup %}
+                {% include "djangobb_forum/includes/markup_editor.html" %}
+            {% endwith %}
+        {% else %}
+            {% with markup=user.forum_profile.markup %}
+                {% include "djangobb_forum/includes/markup_editor.html" %}
+            {% endwith %}
+        {% endif %}
+        <script type="text/javascript">
+           $(document).ready(function() {
+            $(".markup").markItUp(mySettings);
+            $('#id_attachment').bind('change', function() {
+
+                //this.files[0].size gets the size of your file.
+                var fileSize = this.files[0].size;
+                    if(fileSize > 2621440){
+                        alert('File too large! Your size: ' + (fileSize/1024/1024).toFixed(1) + 'MB. Maximum allowed size: 5MB');
+                        this.value = null;
+                    }
+            });
+            $('#id_avatar').bind('change', function() {
+
+                  //this.files[0].size gets the size of your file.
+                  var fileSize = this.files[0].size;
+                    if(fileSize > 2621440){
+                        alert('File too large! Your size: ' + (fileSize/1024/1024).toFixed(1) + 'MB. Maximum allowed size: 2.5MB');
+                        this.value = null;
+                        return;
+                    }
+
+
+                  // get the file name, possibly with path (depends on browser)
+                    var filename = $("#id_avatar").val();
+
+                    // Use a regular expression to trim everything before final dot
+                    var extension = filename.replace(/^.*\./, '');
+
+                    // Iff there is no dot anywhere in filename, we would have extension == filename,
+                    // so we account for this possibility now
+                    if (extension == filename) {
+                        extension = '';
+                    } else {
+                        // if there is an extension, we convert to lower case
+                        // (N.B. this conversion will not effect the value of the extension
+                        // on the file upload.)
+                        extension = extension.toLowerCase();
+                    }
+
+                    if(($.inArray(extension, ['gif','png','jpg','jpeg']) == -1) && extension != '') {
+                        alert('invalid extension!');
+                        this.value = null;
+                    }
+
+
+                });
+            $("#upload_avatar").submit( function(submitEvent) {
+
+
+                // get the file name, possibly with path (depends on browser)
+                var filename = $("#id_avatar").val();
+
+                // Use a regular expression to trim everything before final dot
+                var extension = filename.replace(/^.*\./, '');
+
+                // Iff there is no dot anywhere in filename, we would have extension == filename,
+                // so we account for this possibility now
+                if (extension == filename) {
+                    extension = '';
+                } else {
+                    // if there is an extension, we convert to lower case
+                    // (N.B. this conversion will not effect the value of the extension
+                    // on the file upload.)
+                    extension = extension.toLowerCase();
+                }
+
+                if(($.inArray(extension, ['gif','png','jpg','jpeg']) == -1) && extension != '') {
+                    alert('invalid extension!');
+                    submitEvent.preventDefault();
+                }
+
+            });
+           });
+        </script>
+    {% endif %}
+
+    {% if highlight_word %}
+        <script type="text/javascript" src="{{ STATIC_URL }}djangobb_forum/js/jquery.highlight-3.pack.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("div.postmsg").highlight("{{ highlight_word }}");
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+{% block extra_head %}
+    {{ block.super }}
+    <script type="text/javascript">
+        var STATIC_URL = "{{ STATIC_URL }}";
+        var POST_PREVIEW_URL = "{% url 'djangobb:post_preview' %}";
+    </script>
+    {% block extra_meta %}{% endblock %}
+{% endblock %}
+{% block rsslink_head %}
+    <link rel="alternate" type="application/atom+xml" href="{% url 'djangobb:forum_posts_feed' %}" title="{% trans "Latest posts on forum" %}" />
+    <link rel="alternate" type="application/atom+xml" href="{% url 'djangobb:forum_topics_feed' %}" title="{% trans "Latest topics on forum" %}" />
+{% endblock %}
+
+{% block main_content %}
+    {# include 'djangobb_forum/header.html' #}
+
+{#    {% block messages %}#}
+{#        {% if messages %}#}
+{#        <div id="messages">#}
+{#            {% for message in messages %}#}
+{#                <div class="message{% if message.tags %} {{ message.tags }}{% endif %}" role="alert">{{ message }}</div>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#        {% endif %}#}
+{#    {% endblock messages %}#}
+
+	{% block pre_content %}{% endblock %}
+	{% block content %}{% endblock %}
+	{% block post_content %}{% endblock %}
+
+    {% block board_footer %}
+        <div class="content-container no-padding">
+            <ul class="forum-header">
+                <li>
+                    <dl>
+                        <dt class="forum-stats-title"><i class="fa fa-fw fa-info"></i>{% trans "Board footer" %}</dt>
+                    </dl>
+                </li>
+            </ul>
+            <div class="row row-no-marg">
+                <div class="col s12 m12 l4">
+                    <dl id="searchlinks" class="conl">
+                        <dt><h6>{% trans "Search links" %}</h6></dt>
+                        <dd><a href="{% url 'djangobb:search' %}?action=show_24h">{% trans "Show recent posts" %}</a></dd>
+                        <dd><a href="{% url 'djangobb:search' %}?action=show_unanswered">{% trans "Show unanswered posts" %}</a></dd>
+                        {% if user.is_authenticated %}
+                            <dd><a href="{% url 'djangobb:search' %}?action=show_subscriptions">{% trans "Show your subscribed topics" %}</a></dd>
+                            <dd>{% trans "Show your" %} <a href="{% url 'djangobb:search' %}?action=show_user&amp;show_as=topics">{% trans "topics" %}</a>&nbsp;/&nbsp;<a href="{% url 'djangobb:search' %}?action=show_user&amp;show_as=posts">{% trans "posts" %}</a></dd>
+                        {% endif %}
+                    </dl>
+                </div>
+                <div class="col s12 m12 l3">
+                    {% block controls %}{% endblock %}
+                </div>
+                <div class="col s12 m12 l5">
+                    {% block jumpto_select %}
+                    <form method="GET" class="forum-jumpto-select" action="{% url 'djangobb:index' %}">
+                        <div class="input-field">
+                            <select id="forum_id" onchange="window.location=('{% url 'djangobb:index' %}'+this.options[this.selectedIndex].value)">
+                                <option value="" disabled selected>{% trans 'Jump to' %}</option>
+                                {% for category in categories %}
+                                    <optgroup label="{{ category }}">
+                                        {% for forum in category.forums.all %}
+                                            <option value="{{ forum.id }}">{{ forum }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    {% endblock board_footer %}
+{% endblock %}

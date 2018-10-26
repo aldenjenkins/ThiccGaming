@@ -1,0 +1,131 @@
+{% extends "base-actual.html" %}
+
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Rules" %}{% endblock %}
+{% block title %}{% endblock %}
+
+{% block main_content %}
+
+{#    <div class="content-container">#}
+{#        <h4>{% trans 'Coming Soon' %}</h4>#}
+{#        <p class="no-padding-top">{% blocktrans %}Stay updated by joining our <a href = "http://steamcommunity.com/groups/FooBarGaming">Steam Group</a> to#}
+{#                                                  be notified when our upcoming servers open up! We will be having#}
+{#                                                  huge give aways and prizes for the first day of each servers'#}
+{#                                                  opening, so staying connected is crucial.{% endblocktrans %}#}
+{#        </p>#}
+{#    </div>#}
+
+
+
+    <div class="content-container">
+        <h3>
+            Rules
+        </h3>
+        <p>Below are the rules for all our game servers. Anyone breaking these rules are subject to an appropriate punishment (kick, ban, mute etc) by our admin team. However, we may give a warning or 2 before taking action for less serious offences. By playing our game servers you are agreeing to these rules. You can also access these in-game by typing <code>!rules</code>. If you find that another player is breaking any of these rules in-game, please use the <code>/report</code> command to report them to an admin.</p>
+        <ul class="restyle-list list-items-mar-bottom list-mar-bottom description-list">
+            <li>
+                <dl>
+                    <dt class="text-highlight">No advertising of unrelated servers or websites without permission</dt>
+                    <dd>We obviously don't like people trying to make the people playing on our servers go to other servers, we like having people online.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">No cheating (aimbotting, wallhacks etc)</dt>
+                    <dd>Another obvious one, we catch you cheating, you get the ban-hammer.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">No discrimination or harassment of any kind</dt>
+                    <dd>No forms of discrimination or harassment are welcome here, this includes racism, homophobia etc. Nobody wants to hear it, if you find someone annoying just ignore them. It's a waste of valuable space in the chat box.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">English must be the only language used on this server at all times</dt>
+                    <dd>The majority of our players can speak English, so we enforce English only so that everybody can understand everyone else. Nobody wants to hear people talking in various different languages that they can't understand. If you want to speak a different language, use Mumble, Steam Friends, XFire, Skype, etc. There are plenty of options.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Sprays much be legal and suitable for player 15+</dt>
+                    <dd>Another simple one, kids play here. If you don't think it's suitable for a child to see then don't spray it here. This means no porn/hentai sprays. Any sprays that contain illage images will get you banned and reported to Valve and your local authorities.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">Sound clips are allowed but keep them short and don't spam</dt>
+                    <dd>Sound clips can be fun, little clips relevant to the game. Clips such as "Boom headshot" or "NO U!" can be funny, and are fine. However please remember that voice chat is mainly for voice chat, don't drown people who are trying to speak out with your clips and keep them short. We also ask that you don't play music over the microphone, not everybody has the same taste in music and it drowns out the people who are trying to speak. If you want to listen to music then use a media player.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                     <dt class="text-highlight">No spamming text or voice chat</dt>
+                     <dd>Pretty much the same reasoning as above, please don't fill the chat box or voice chat with pointless crap. People need to use them for communication, and nobody wants to hear the same thing over and over again.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">No impersonation of staff members is not allowed under any circumstances</dt>
+                    <dd>Pretty obvious this one, if they can't talk in colored text like this...<br> <code class="green-text">(ADMIN) m1str_hankey: Hi!</code><br> Then they are not an administrator, do not listen to what they are saying and report them on the forum. (Note that administrators do not always use green text for normal chat with other players.) This include players threatening to kick/ban you, players using an admins name or people just plain saying they are an admin but not using the green admin chat.</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt class="text-highlight">No ban/mute etc evasion</dt>
+                    <dd>A very obvious one, if you try to evade mutes/bans etc by changing your name or by using any method to try to get around a punishment, we will just ban you or extend your punishment.</dd>
+                </dl>
+            </li>
+        </ul>
+
+        <h4 class="mar-top">The following is useful information that'll help you get along better with everyone</h4>
+
+        <ul class="restyle-list list-items-mar-bottom description-list">
+            <li>
+                <dl>
+                    <dt class="text-highlight">Don't whine about punishments</dt>
+                    <dd>If you feel a punishment wasn't fair, appeal it on our forums with your steamid and a reason. Please don't sit there whining about it. Usually punishments are not issued without warning and are issued when the server rules have been broken, but again we are open to appeals.</dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-container">
+        <h4>{% trans 'Anti-Harrassment Policy' %}</h4>
+        <p>
+        {% blocktrans %}
+            FooBar Gaming does not tolerate harrassment. Its stupid.
+        {% endblocktrans %}
+        </p>
+        <ul class="restyle-list list-items-mar-bottom list-mar-bottom description-list">
+            <li>
+                <dl>
+                     <dt class="text-highlight">Harassment means actions of a derogatory and malicious nature towards people.</dt>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                     <dt class="text-highlight">Harassment based upon an individual's race, ethnicity, national origin, age, sex, religion, or any other personal characteristics will not be tolerated.</dt>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                     <dt class="text-highlight">Harassment based upon an individual's standing within the community, including their management rank (moderator, admin, etc.), or their social standing will not be tolerated.</dt>
+                </dl>
+            </li>
+        </ul>
+
+
+        <p>Failure to abide by these rules will result in disciplinary action, the terms of which will be determined by the administrator presiding over the case.</p>
+
+        <p class="no-padding-top">FooBar Gaming prides itself in its commitment to promoting the equal treatment and representation of all members of the community, while denouncing harassment of any kind, including racism and the use of any racist terms.</p>
+
+        <dt class="text-highlight">TL;DR don't be a dick to your community members.</dt>
+
+
+    </div>
+
+
+{% endblock %}
