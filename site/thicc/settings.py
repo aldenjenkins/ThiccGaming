@@ -84,7 +84,7 @@ DEBUG = os.getenv("DEBUG", False)
 # URLCONF
 if IS_PROD:
     ROOT_URLCONF = 'thicc.urls.production'
-    ALLOWED_HOSTS = ['thicc.io']
+    ALLOWED_HOSTS = ['thicc.io', 'thiccgaming.com']
 elif DEBUG:
     #ROOT_URLCONF = 'thicc.urls.development'
     ROOT_URLCONF = 'thicc.urls.development'
@@ -109,11 +109,6 @@ LANGUAGE_CODE = "en"
 LANGUAGES = (
     ('en', _('English')),
 )
-
-# A boolean that turns on/off debug mode. When set to ``True``, stack traces
-# are displayed for error pages. Should always be set to ``False`` in
-# production. Best set to ``True`` in local_settings.py
-DEBUG = True
 
 # Whether a user's session cookie expires when the Web browser is closed.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
