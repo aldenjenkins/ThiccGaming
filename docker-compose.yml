@@ -22,22 +22,34 @@ services:
     volumes:
       - ./site/:/opt/services/thiccsite/src
     depends_on: 
-     - mysql1
+     - mysql-site
     networks:
      - nginx_network
-     - mysql_network
+     - mysql1_network
 
-  mysql1:
+  mysql-site:
     restart: always
-    build: ./mysql/
+    image: mysql:5.7.19
     volumes:
-      - /data/:/var/lib/mysql
+      - /opt/services/sitedb/:/var/lib/mysql
     env_file:
-      - ./mysql/environment.env
+      - ./mysql/thiccsite/environment.env
     expose:
       - "3306"
     networks:
-      - mysql_network
+      - mysql1_network
+
+  mysql-l4dstats:
+    restart: always
+    image: mysql:5.7.19
+    volumes:
+      - /opt/services/l4dstatsdb/:/var/lib/mysql
+    env_file:
+      - ./mysql/l4dstats/environment.env
+    expose:
+      - "3306"
+    networks:
+      - mysq2_network
 
 #  l4d2:
 #    build: ./game-servers/l4d2
@@ -52,9 +64,8 @@ services:
 networks:
   nginx_network:
     driver: bridge
-  mysql_network:
+  mysql1_network:
+    driver: bridge
+  mysq2_network:
     driver: bridge
 
-# volumes:
-#   mysql1_volume:
-#   l4d2_volume:
