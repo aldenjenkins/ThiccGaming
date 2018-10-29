@@ -17,6 +17,7 @@ services:
       - nginx_network
 
   django:
+    restart: always
     build: ./site/
     env_file: ./site/environment.env
     volumes:

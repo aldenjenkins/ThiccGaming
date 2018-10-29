@@ -73,3 +73,4 @@ static/
 environment.env
 game-servers/
 *.sql
+old_nginx_for_foobargaming
