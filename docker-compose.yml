@@ -1,7 +1,6 @@
 version: "2"
 
 services:
-
   nginx:
     restart: always
     image: nginx:1.13
@@ -51,6 +50,18 @@ services:
       - "3306"
     networks:
       - mysq2_network
+
+  teamspeak:
+    image: teamspeak
+    ports:
+      - "9987:9987/udp"
+      - "30033:30033"
+      - "10011:10011"
+    environment:
+      - TS3SERVER_LICENSE=accept
+    volumes:
+      - /data/teamspeak3:/var/ts3server/
+    restart: always
 
 #  l4d2:
 #    build: ./game-servers/l4d2
