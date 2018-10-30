@@ -29,6 +29,11 @@ Docker-compose makes the deployment for this very automatited and easy. There is
   * Install [Docker](https://docs.docker.com/install/) and [Docker-compose](https://docs.docker.com/compose/install/). Run `docker-compose run django python manage.py migrate` from the main folder. 
       docker-compose creates a volume on the host machine so this only needs to be run once instead of everytime we start the django container. This will also need to be run again every time
       you create new migrations when you run `docker-compose run django python manage.py makemigrations`.
+  * create local directories for your docker volumes to mount to; providing two-way writing ability, to and from the container.
+      - `sudo mkdir -p /data/teamspeak3-docker`
+      - `sudo mkdir /data/mysql-l4dstats-docker`
+      - `sudo mkdir /data/mysql-site-docker`
+
   * Run `docker-compose up` from the main folder.
 
 5. Visit http://localhost/ and notice how there is no port specified on that url. Docker-compose is running
