@@ -49,7 +49,7 @@ services:
     expose:
       - "3306"
     networks:
-      - mysq2_network
+      - mysql2_network
 
   teamspeak:
     image: teamspeak
@@ -63,21 +63,23 @@ services:
       - /data/teamspeak3:/var/ts3server/
     restart: always
 
-#  l4d2:
-#    build: ./game-servers/l4d2
-#    volumes: 
-#      - ./l4d2/cfg:/opt/services/l4d2/left4dead2/cfg
-#      - ./l4d2/addons:/opt/services/l4d2/left4dead2/addons
-#    restart: always
-#    networks:
-#      - nginx_network
-#      - mysql_network
+  l4d2:
+    build: ./game-servers/l4d2
+    depends_on:
+      - mysql-l4dstats
+    volumes:
+      - ./game-servers/l4d2/addons:/opt/l4d2/left4dead2/addons
+      - ./game-servers/l4d2/cfg:/opt/l4d2/left4dead2/cfg
+    restart: always
+    networks:
+      - mysql1_network
+      - mysql2_network
 
 networks:
   nginx_network:
     driver: bridge
   mysql1_network:
     driver: bridge
-  mysq2_network:
+  mysql2_network:
     driver: bridge
 
