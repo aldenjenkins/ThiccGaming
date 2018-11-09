@@ -7,6 +7,8 @@ services:
     container_name: nginx-container
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/letsencrypt
+      - ./nginx/certs-data:/data/letsencrypt
     ports:
       - 80:80
       - 443:443
@@ -26,6 +28,29 @@ services:
     networks:
      - nginx_network
      - mysql1_network
+     - rabbitmq_network
+    command: gunicorn -b :8000 --reload thicc.wsgi:application
+
+  celery:
+    restart: always
+    build: ./site
+    env_file: ./site/environment.env
+    volumes:
+      - ./site/:/opt/services/thiccsite/src
+    depends_on: 
+     - mysql-site
+     - rabbitmq
+    networks:
+     - mysql1_network
+     - rabbitmq_network
+    command: celery -A thicc.celery_tasks worker --loglevel=info
+
+  rabbitmq:
+    restart: always
+    env_file: ./rabbitmq/environment.env
+    image: "rabbitmq:3-management"
+    networks:
+     - rabbitmq_network
 
   mysql-site:
     restart: always
@@ -34,8 +59,6 @@ services:
       - /opt/services/sitedb/:/var/lib/mysql
     env_file:
       - ./mysql/thiccsite/environment.env
-    expose:
-      - "3306"
     networks:
       - mysql1_network
 
@@ -46,10 +69,9 @@ services:
       - /opt/services/l4dstatsdb/:/var/lib/mysql
     env_file:
       - ./mysql/l4dstats/environment.env
-    expose:
-      - "3306"
     networks:
       - mysql2_network
+
 
   teamspeak:
     image: teamspeak
@@ -62,7 +84,7 @@ services:
     volumes:
       - /data/teamspeak3:/var/ts3server/
     restart: always
-
+  
   l4d2:
     build: ./game-servers/l4d2
     depends_on:
@@ -70,10 +92,31 @@ services:
     volumes:
       - ./game-servers/l4d2/addons:/opt/l4d2/left4dead2/addons
       - ./game-servers/l4d2/cfg:/opt/l4d2/left4dead2/cfg
+      - ./game-servers/l4d2/steam_appid.txt:/opt/l4d2/steam_appid.txt
+      - ./game-servers/l4d2/host.txt:/opt/l4d2/host.txt
+      - ./game-servers/l4d2/motd.txt:/opt/l4d2/motd.txt
     restart: always
     networks:
       - mysql1_network
       - mysql2_network
+
+  # phpmyadmin:
+  #  image: phpmyadmin/phpmyadmin
+  #  container_name: phpmyadmin
+  #  environment:
+  #   - PMA_ARBITRARY=1
+  #  restart: always
+  #  ports:
+  #   - 8080:80
+  #  volumes:
+  #   - /sessions
+  #  depends_on: 
+  #   - mysql-site
+  #   - mysql-l4dstats
+  #  networks:
+  #   - nginx_network
+  #   - mysql1_network
+  #   - mysql2_network
 
 networks:
   nginx_network:
@@ -81,5 +124,7 @@ networks:
   mysql1_network:
     driver: bridge
   mysql2_network:
+    driver: bridge
+  rabbitmq_network:
     driver: bridge
 

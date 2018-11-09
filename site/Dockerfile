@@ -11,6 +11,6 @@ RUN pip install -r requirements.txt
 COPY . /opt/services/thiccsite/src
 
 EXPOSE 8000
-CMD ["gunicorn", "-b", ":8000", "thicc.wsgi:application"]
+#CMD ["gunicorn", "-b", ":8000", "thicc.wsgi:application"]
 #CMD ["python", "manage.py", "runserver"]
 

@@ -32,3 +32,21 @@ class GModStat(models.Model):
 
     def __str__self(self):
         return self.player
+
+
+@python_2_unicode_compatible
+class SteamUser(models.Model):
+    linkedSteamAccount = models.ForeignKey(blank=True, null=True)
+    linkedSiteProfile = models.ForeignKey(blank=True, null=True)
+    steamid = models.ForeignKey(blank=True, null=True)
+    name = models.CharField(blank=True, null=True)
+    statcount = models.IntegerField(blank=True, null=True)
+    gmod_kills = models.IntegerField()
+    l4d2_kills = models.IntegerField()
+    gmod_headshots = models.IntegerField()
+    l4d2_headshots = models.IntegerField()
+    saferoom_completes = models.IntegerField()
+    gmod_kills = models.IntegerField()
+    gmod_kills = models.IntegerField()
+    gmod_kills = models.IntegerField()
+

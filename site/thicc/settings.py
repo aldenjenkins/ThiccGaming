@@ -265,6 +265,7 @@ INSTALLED_APPS = (
     'thicc.apps.scape',
     'thicc.apps.bans',
     'storages',
+    'django_celery_beat',
 )
 
 apps = INSTALLED_APPS
@@ -509,6 +510,9 @@ AVATAR_ALLOWED_FILE_EXTS = (
 #
 NORECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_KEY")
 NORECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET")
+
+RABBITMQ_USER = os.getenv("RABBITMQ_USER")
+RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
