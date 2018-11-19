@@ -1,0 +1,152 @@
+{% load i18n static stat_tags %}
+<table class="ban-table">
+    <tr class ="row table-header">
+        <th>Overall Rank</th>
+        <th>User</th>
+        <th>Total Points</th>
+        <th>Play Time</th>
+        <th>Last Online</th>
+    </tr>
+    {% for stat in stats_list %}
+        <tr class = "ban-row" style="cursor:pointer;">
+            <td>
+                {# Rank #}
+                <b>{{ forloop.counter }}</b>
+            </td>
+            <td>
+                {# User & Photo #}
+                {% if stat.linked_steam %}
+                    {% if stat.linked_steam.user.forum_profile.avatar and stat.linked_steam.user.forum_profile.show_avatar %}
+                        <a  href="{% url 'djangobb:forum_profile' stat.user.user.username %}">
+                        <img src="{{ stat.linked_steam.user.forum_profile.avatar.url }}" width = "30px" style="vertical-align:middle;" alt="User Avatar" />
+                        <b>{{ stat.linked_steam.user.username }}</b>
+                        </a>
+                    {% else %}
+                        {% if forum_settings.GRAVATAR_SUPPORT and stat.user.user.forum_profile.show_avatar %}
+                            <a href="{% url 'djangobb:forum_profile' stat.linked_steam.user.username %}">
+                            <img src="{% gravatar stat.linked_steam.user.email %}" width = "30px" style="vertical-align:middle;" alt="User Avatar" />
+                            <b>{{ stat.linked_steam.user.username }}</b>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    {{ stat.last_user_username }}
+                {% endif %}
+            </td>
+            <td>
+                {{ stat.total_points }}
+            </td>
+            <td>
+                {% seconds_to_duration stat.total_playtime %}
+            </td>
+            <td>
+                {{ stat.updated_at|timesince }} ago
+            </td>
+        </tr>
+        <tr class="ban-info" style="display:none">
+            <td colspan="7" align="center" style="padding:0px">
+                <div class="opener" style="padding-top: 0px; border-top: none; padding-bottom: 0px; border-bottom: none; overflow: hidden; visibility: visible; zoom: 1;">
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td align="left" colspan="3">
+                                    <b>User's Breakdown</b>
+                                </td>
+                            </tr>
+                            <tr align="left">
+                                <td width="30%" height="5" >Thicc Forum Profile</td>
+                                <td height="5" >
+                                    {% if stat.linked_steam %}
+                                        <a href = {% url 'djangobb:forum_profile' stat.linked_steam.user.username %}>{{ stat.linked_steam.user.username }}</a>
+                                    {% else %}
+                                        No linked account
+                                    {% endif %}
+                                </td>
+                            </tr>
+                           <tr align="left">
+                               <td width="20%" height="5" class="listtable_1">First Seen</td>
+                               <td height="5" class="listtable_1">
+                                   {{ stat.created_at }}
+                               </td>
+                           </tr>
+                            <tr align="left">
+                                <td width="20%" height="5">Steam ID</td>
+                                <td height="5">
+                                    {{ stat.steamid }}
+                                </td>
+                            </tr>
+                            <tr align="left">
+                                <td width="20%" height="5">Steam3 ID</td>
+                                <td height="5" >
+                                    <a href="http://steamcommunity.com/profiles/{{ stat.steam3 }}" target="_blank">{{ stat.steam3 }}</a>
+                                </td>
+                            </tr>
+                            <tr align="left">
+                                <td width="20%" height="5" >Steam Community</td>
+                                <td height="5" ><a href="http://steamcommunity.com/profiles/{{ stat.steam64 }}" target="_blank">{{ stat.steam64 }}</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <tbody>
+                            <tr class="ban-row"style="cursor:pointer;"><td style="text-align:center; background-color:#f5fbff;"><img src="{{ STATIC_URL }}img/l4d2-logo.png" width = "30px" style="vertical-align: middle;"><b>Left 4 Dead 2 Breakdown ({{ stat.l4d2_points }} Points)</b></td></tr>
+                            <tr class="ban-info" style="; display: none;">
+                               <td colspan="7" align="center" style="padding:0px;">
+                                   <div class="opener" style="padding-top: 0px; border-top: none; padding-bottom: 0px; border-bottom: none; overflow: hidden; visibility: visible; zoom: 1; ">
+                                       <table width="100%" cellspacing="0" cellpadding="0">
+                                           <tbody>
+                                               <tr align="left">
+                                                   <td width="30%">Play Time</td>
+                                                   <td>
+                                                       {% seconds_to_duration stat.l4d2_playtime %}
+                                                   </td>
+                                               </tr>
+                                               {% for key, attribute in stat.l4d2_stats.items %}
+                                               <tr align="left">
+                                                   <td width="30%">{{ key }}</td>
+                                                   <td>
+                                                       {{ attribute }}
+                                                   </td>
+                                               </tr>
+                                               {% endfor %}
+                                           </tbody>
+                                       </table>
+                                   </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <tbody>
+                            <tr class="ban-row"style="cursor:pointer;"><td style="text-align:center; background-color:#f5fbff;"><img src="{{ STATIC_URL }}img/gmod-logo.png" width = "30px" style="vertical-align: middle;"><b>Garry's Mod ZS Breakdown ({{ stat.gmodzs_points }} Points)</b></td></tr>
+                            <tr class="ban-info" style="display: none;">
+                               <td colspan="7" align="center" style="padding:0px;">
+                                   <div class="opener" style="padding-top: 0px; border-top: none; padding-bottom: 0px; border-bottom: none; overflow: hidden; visibility: visible; zoom: 1; ">
+                                       <table width="100%" cellspacing="0" cellpadding="0">
+                                           <tbody>
+                                               <tr align="left">
+                                                   <td width="30%">Play Time</td>
+                                                   <td>
+                                                       {% seconds_to_duration stat.gmodzs_playtime %}
+                                                   </td>
+                                               </tr>
+                                               {% for key, attribute in stat.gmodzs_stats.items %}
+                                               <tr align="left">
+                                                   <td width="30%">{{ key }}</td>
+                                                   <td>
+                                                       {{ attribute }}
+                                                   </td>
+                                               </tr>
+                                               {% endfor %}
+                                           </tbody>
+                                       </table>
+                                   </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+</table>

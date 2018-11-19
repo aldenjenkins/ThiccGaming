@@ -84,7 +84,7 @@ DEBUG = os.getenv("DEBUG", False)
 # URLCONF
 if IS_PROD:
     ROOT_URLCONF = 'thicc.urls.production'
-    ALLOWED_HOSTS = ['thicc.io', 'thiccgaming.com']
+    ALLOWED_HOSTS = ['thicc.io', 'www.thicc.io', 'thiccgaming.com', 'www.thiccgaming.com']
 elif DEBUG:
     #ROOT_URLCONF = 'thicc.urls.development'
     ROOT_URLCONF = 'thicc.urls.development'
@@ -121,11 +121,11 @@ USE_I18N = False
 
 AUTHENTICATION_BACKENDS = (
     "social.backends.steam.SteamOpenId",
-    "social.backends.twitter.TwitterOAuth",
-    "social.backends.google.GoogleOAuth2",
-    "social.backends.github.GithubOAuth2",
-    "social.backends.facebook.FacebookOAuth2",
-    "social.backends.reddit.RedditOAuth2",
+    # "social.backends.twitter.TwitterOAuth",
+    # "social.backends.google.GoogleOAuth2",
+    # "social.backends.github.GithubOAuth2",
+    # "social.backends.facebook.FacebookOAuth2",
+    # "social.backends.reddit.RedditOAuth2",
     "mezzanine.core.auth_backends.MezzanineBackend",
 )
 
@@ -162,7 +162,7 @@ DATABASES = {
         'USER': os.getenv('DB_USER', 'metoo_admin'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
         'HOST': os.getenv('DOCKER_DB_NAME', 'mysql1'),
-       'PORT': os.getenv('DB_PORT', 5432)
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
 
@@ -264,6 +264,7 @@ INSTALLED_APPS = (
     'thicc.apps.django_azelphurmotd',
     'thicc.apps.scape',
     'thicc.apps.bans',
+    'thicc.apps.stats',
     'storages',
     'django_celery_beat',
 )

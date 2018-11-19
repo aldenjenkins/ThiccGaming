@@ -27,7 +27,7 @@ services:
      - mysql-site
     networks:
      - nginx_network
-     - mysql1_network
+     - mysql_network
      - rabbitmq_network
     command: gunicorn -b :8000 --reload thicc.wsgi:application
 
@@ -41,7 +41,7 @@ services:
      - mysql-site
      - rabbitmq
     networks:
-     - mysql1_network
+     - mysql_network
      - rabbitmq_network
     command: celery -A thicc.celery_tasks worker --loglevel=info
 
@@ -60,71 +60,75 @@ services:
     env_file:
       - ./mysql/thiccsite/environment.env
     networks:
-      - mysql1_network
+      - mysql_network
 
-  mysql-l4dstats:
-    restart: always
-    image: mysql:5.7.19
-    volumes:
-      - /opt/services/l4dstatsdb/:/var/lib/mysql
-    env_file:
-      - ./mysql/l4dstats/environment.env
-    networks:
-      - mysql2_network
+  # mysql-l4dstats:
+  # restart: always
+  # image: mysql:5.7.19
+  # volumes:
+  #   - /opt/services/l4dstatsdb/:/var/lib/mysql
+  # env_file:
+  #   - ./mysql/l4dstats/environment.env
+  # networks:
+  #   - mysql2_network
 
 
-  teamspeak:
-    image: teamspeak
-    ports:
-      - "9987:9987/udp"
-      - "30033:30033"
-      - "10011:10011"
-    environment:
-      - TS3SERVER_LICENSE=accept
-    volumes:
-      - /data/teamspeak3:/var/ts3server/
-    restart: always
+  ## teamspeak:
+  ##  image: teamspeak
+  ##  ports:
+  ##    - "9987:9987/udp"
+  ##    - "30033:30033"
+  ##    - "10011:10011"
+  ##  environment:
+  ##    - TS3SERVER_LICENSE=accept
+  ##  volumes:
+  ##    - /data/teamspeak3:/var/ts3server/
+  ##  restart: always
   
   l4d2:
     build: ./game-servers/l4d2
     depends_on:
-      - mysql-l4dstats
+      - mysql-site
     volumes:
       - ./game-servers/l4d2/addons:/opt/l4d2/left4dead2/addons
       - ./game-servers/l4d2/cfg:/opt/l4d2/left4dead2/cfg
       - ./game-servers/l4d2/steam_appid.txt:/opt/l4d2/steam_appid.txt
-      - ./game-servers/l4d2/host.txt:/opt/l4d2/host.txt
-      - ./game-servers/l4d2/motd.txt:/opt/l4d2/motd.txt
+      - ./game-servers/l4d2/host.txt:/opt/l4d2/left4dead2/host.txt
+      - ./game-servers/l4d2/motd.txt:/opt/l4d2/left4dead2/motd.txt
     restart: always
+    ports:
+      - "27000-27050:27000-27050/udp"
+      - "27000-27050:27000-27050"
     networks:
-      - mysql1_network
-      - mysql2_network
+      - mysql_network
+    command: /opt/l4d2/srcds_run -game left4dead2 -secure -console -usercon -ip 0.0.0.0 
+
 
   # phpmyadmin:
-  #  image: phpmyadmin/phpmyadmin
-  #  container_name: phpmyadmin
-  #  environment:
-  #   - PMA_ARBITRARY=1
-  #  restart: always
-  #  ports:
-  #   - 8080:80
-  #  volumes:
-  #   - /sessions
-  #  depends_on: 
-  #   - mysql-site
-  #   - mysql-l4dstats
-  #  networks:
-  #   - nginx_network
-  #   - mysql1_network
-  #   - mysql2_network
+  # image: phpmyadmin/phpmyadmin
+  # container_name: phpmyadmin
+  # environment:
+  #  - PMA_ARBITRARY=1
+  # restart: always
+  # ports:
+  #  - 8080:80
+  # volumes:
+  #  - /sessions
+  # depends_on: 
+  #  - mysql-site
+  #  - mysql-l4dstats
+  # networks:
+  #  - nginx_network
+  #  - mysql1_network
+  #  - mysql2_network
 
 networks:
   nginx_network:
     driver: bridge
-  mysql1_network:
+  mysql_network:
     driver: bridge
-  mysql2_network:
-    driver: bridge
+  # mysql2_network:
+  # driver: bridge
   rabbitmq_network:
     driver: bridge
 

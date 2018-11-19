@@ -57,6 +57,7 @@ urlpatterns = i18n_patterns(
     url(r'^about/', include('thicc.apps.about.urls')),
     url(r'^copyright/', include('thicc.apps.copyright.urls')),
     url(r'^rules/', include('thicc.apps.rules.urls')),
+    url(r'^stats/', include('thicc.apps.stats.urls', namespace='stats')),
 )
 
 if settings.USE_MODELTRANSLATION:

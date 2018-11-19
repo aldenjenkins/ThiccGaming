@@ -1,0 +1,41 @@
+{% extends "base-actual.html" %}
+{% load i18n static ban_tags %}
+{% block meta_title %}{% trans 'Add Ban' %} | {% trans 'Stats' %}{% endblock %}
+
+{% block breadcrumb_menu %}
+    <div class="content-container no-padding">
+        <div class="breadcrumbs count-3">
+            <a href="{% url 'home' %}"><i class="fa fa-fw fa-home"></i></a>
+            <a href="{% url 'stats:index' %}">{% trans 'Bans' %}</a>
+            <a href="{% url 'stats:ban' %}">{% trans 'Add Ban' %}</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block main_content %}
+
+	<div class="content-container">
+{#        {% for field in form %}#}
+{#            {% for error in field.errors %}#}
+{#                {{ error }}#}
+{#            {% endfor %}#}
+{#        {% endfor %}#}
+        <form method="POST" class="post-form">{% csrf_token %}
+
+            {% for field in form %}
+                <div class="fieldWrapper">
+                    {{ field.errors }}
+                    {{ field.label_tag }} {{ field }}
+                </div>
+            {% endfor %}
+            <button class="btn waves-light" type="submit">Create Ban</button>
+        </form>
+
+
+    </div>
+
+
+{% endblock %}
+
+
+

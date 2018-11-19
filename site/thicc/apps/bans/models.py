@@ -10,7 +10,7 @@ from time import timezone
 @python_2_unicode_compatible
 class Ban(models.Model):
 
-#for mysql
+    # for mysql
     # bid        = models.IntegerField(primary_key=True)
     # ip         = models.CharField(max_length=32)
     # authid     = models.CharField(max_length=64)
@@ -29,24 +29,24 @@ class Ban(models.Model):
     # type       = models.SmallIntegerField(max_length=4)
     # ureason    = models.TextField()
 
-#for sqlite
-    bid        = models.AutoField(primary_key=True)
-    ip         = models.CharField(max_length=32, null=True)
-    authid     = models.CharField(max_length=64)
-    name       = models.CharField(max_length=128)
-    created    = models.IntegerField()
-    ends       = models.IntegerField()
-    length     = models.IntegerField()
-    reason     = models.TextField()
-    aid        = models.IntegerField()
-    adminIp    = models.CharField(max_length=32)
-    sid        = models.IntegerField(null=False, default=0)
-    country    = models.CharField(max_length=4, null=True)
-    RemovedBy  = models.IntegerField(null=True)
+    # for sqlite
+    bid = models.AutoField(primary_key=True)
+    ip = models.CharField(max_length=32, null=True)
+    authid = models.CharField(max_length=64)
+    name = models.CharField(max_length=128)
+    created = models.IntegerField()
+    ends = models.IntegerField()
+    length = models.IntegerField()
+    reason = models.TextField()
+    aid = models.IntegerField()
+    adminIp = models.CharField(max_length=32)
+    sid = models.IntegerField(null=False, default=0)
+    country = models.CharField(max_length=4, null=True)
+    RemovedBy = models.IntegerField(null=True)
     RemoveType = models.CharField(max_length=3,null=True)
-    RemovedOn  = models.IntegerField(null=True)
-    type       = models.SmallIntegerField(null=False, default=0)
-    ureason    = models.TextField(null=True)
+    RemovedOn = models.IntegerField(null=True)
+    type = models.SmallIntegerField(null=False, default=0)
+    ureason = models.TextField(null=True)
     # comments   = models.TextField(null=True, blank=True)
 
 

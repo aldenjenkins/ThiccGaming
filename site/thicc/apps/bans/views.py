@@ -17,8 +17,7 @@ from django.contrib.auth.decorators import login_required
 steamid64ident = 76561197960265728
 
 def getSteam64FromString(steamid):
-    steam64id = 76561197960265728  # I honestly don't know where
-    # this came from, but it works...
+    steam64id = 76561197960265728  
     id_split = steamid.split(":")
     try:
         steam64id += int(id_split[2]) * 2  # again, not sure why multiplying by 2...
@@ -56,9 +55,10 @@ def index(request):
     comment_form = CommentForm()
     reban_form = RebanForm()
     bans = Ban.objects.all()
-    num_bans=bans.count()
+    num_bans = bans.count()
 
-    paginator = Paginator(bans, 16)  # Show 12 contacts per page.
+    # Show 16 bans per page.
+    paginator = Paginator(bans, 16)  
     page = request.GET.get('page')
     try:
         bans = paginator.page(page)
@@ -78,12 +78,12 @@ def index(request):
     for ban in bans:
         parseBan(ban)
 
-    return render(request, 'bans/ban_list.html', { 'bans' : bans,
-                                                   'num_bans': num_bans,
-                                                   'username': username,
-                                                    'unban_form' : unban_form,
-                                                    'reban_form' : reban_form,
-                                                    'comment_form' : comment_form,})
+    return render(request, 'bans/ban_list.html', {'bans': bans,
+                                                  'num_bans': num_bans,
+                                                  'username': username,
+                                                  'unban_form': unban_form,
+                                                  'reban_form': reban_form,
+                                                  'comment_form': comment_form})
 
 
 def search(request):
@@ -137,9 +137,9 @@ def search(request):
                                                             'count': count,
                                                             # 'name': name,
                                                             'full_path': current_url,
-                                                            'unban_form' : unban_form,
-                                                            'reban_form' : reban_form,
-                                                            'comment_form' : comment_form,})
+                                                            'unban_form': unban_form,
+                                                            'reban_form': reban_form,
+                                                            'comment_form': comment_form,})
 
 
 def parseBan(ban):
