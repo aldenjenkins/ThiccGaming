@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from django.utils.timesince import timesince
 
 
-
 register = template.Library()
 
 
@@ -30,10 +29,11 @@ def gravatar(context, email):
     else:
         return ''
 
+
 @register.simple_tag(takes_context=True)
 def seconds_to_duration(context, seconds):
     #seconds  = math.floor((new Date() - date)/1000),
-    interval = math.floor(seconds / 31536000)
+    interval = math.floor(int(seconds) / 31536000)
     #  console.log("seconds: " + seconds + " interval: " + interval)
     if interval >= 1:
         return str(interval) + " years"
@@ -51,14 +51,16 @@ def seconds_to_duration(context, seconds):
         return str(interval) + " minutes"
     return str(math.floor(seconds)) + " seconds"
 
+
 @register.simple_tag(takes_context=True)
-def age(context, value):
+def age_from_char_epoch(context, value):
     now = datetime.now()
+    value = datetime.fromtimestamp(int(value))
     try:
         difference = now - value
-    except:
+    except Exception:
         return value
 
     if difference <= timedelta(minutes=1):
         return 'just now'
-    return '%(time)s ago' % {'time': timesince(value)}#.split(', ')[0]}
+    return '%(time)s ago' % {'time': timesince(value)}  # .split(', ')[0]}

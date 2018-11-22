@@ -30,7 +30,7 @@
                         {% endif %}
                     {% endif %}
                 {% else %}
-                    {{ stat.last_user_username }}
+                    {{ stat.last_used_username }}
                 {% endif %}
             </td>
             <td>
@@ -40,7 +40,7 @@
                 {% seconds_to_duration stat.total_playtime %}
             </td>
             <td>
-                {{ stat.updated_at|timesince }} ago
+                {% age_from_char_epoch stat.last_online %} ago
             </td>
         </tr>
         <tr class="ban-info" style="display:none">

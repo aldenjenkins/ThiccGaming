@@ -86,10 +86,10 @@ class UserStats(models.Model):
         UserSocialAuth, related_name="my_stats_object", on_delete=models.SET_NULL,
         blank=True, null=True)
     steam64 = models.CharField(max_length=255, null=False)
-    ip = models.CharField(max_length=32, blank=True, default=0)
-    last_used_username = models.CharField(max_length=128, blank=True, null=True)
-    last_online = models.DateTimeField(max_length=128, blank=False)
-    last_gamemode = models.DateTimeField(max_length=128, blank=False)
+    ip = models.CharField(max_length=16, blank=True, default="0.0.0.0")
+    last_used_username = models.CharField(max_length=255, blank=False, null=False)
+    last_online = models.CharField(max_length=255, blank=False)
+    last_gamemode = models.IntegerField(blank=False)
     total_points = models.IntegerField(blank=True, default=0)
     total_playtime = models.IntegerField(blank=True, default=0)
     l4d2_points = models.IntegerField(blank=True, default=0)
@@ -107,6 +107,7 @@ class UserStats(models.Model):
     l4d2_kill_boomer = models.IntegerField(blank=True, default=0)
     l4d2_kill_spitter = models.IntegerField(blank=True, default=0)
     l4d2_kill_charger = models.IntegerField(blank=True, default=0)
+    l4d2_kill_jockey = models.IntegerField(blank=True, default=0)
     l4d2_kill_tank = models.IntegerField(blank=True, default=0)
     l4d2_infected_jockey_ridetime = models.FloatField(blank=True, default=0)
     l4d2_infected_jockey_rides = models.IntegerField(blank=True, default=0)
@@ -149,6 +150,7 @@ class UserStats(models.Model):
     l4d2_award_protect = models.IntegerField(blank=True, default=0)
     l4d2_award_revive = models.IntegerField(blank=True, default=0)
     l4d2_award_teamkill = models.IntegerField(blank=True, default=0)
+    l4d2_award_scatteringram = models.IntegerField(blank=True, default=0)
     gmodzs_headshots = models.IntegerField(blank=True, default=0)
     gmodzs_playtime = models.IntegerField(blank=True, default=0)
     gmodzs_points = models.IntegerField(blank=True, default=0)
@@ -189,25 +191,27 @@ class UserStats(models.Model):
             "Points Infected": self.l4d2_points_infected,
             "Points Survivor": self.l4d2_points_survivor,
             "Friendly Fires": self.l4d2_friendly_fire,
+            "Team Kills": self.l4d2_award_teamkill,
             "Kills": self.l4d2_kills,
             "Kills with melee weapons": self.l4d2_melee_kills,
-            "Kills as Survivor": self.l4d2_kills_survivor,
-            "Kills as Infected": self.l4d2_kill_infected,
-            "Kills as Hunter": self.l4d2_kill_hunter,
-            "Kills as Boomer": self.l4d2_kill_boomer,
-            "Kills as Spitter": self.l4d2_kill_spitter,
+            "Survivors Killed": self.l4d2_kills_survivor,
+            "Infected Killed": self.l4d2_kill_infected,
+            "Hunters Killed": self.l4d2_kill_hunter,
+            "Boomers Killed": self.l4d2_kill_boomer,
+            "Spitters Killed": self.l4d2_kill_spitter,
+            "Jockeys Killed": self.l4d2_kill_jockey,
+            "Damage Dealt as Jockey": self.l4d2_infected_jockey_damage,
             "Charger Impacts": self.l4d2_charger_impacts,
-            "Charger Damage": self.l4d2_infected_charger_damage,
+            "Damage Dealt as Charger": self.l4d2_infected_charger_damage,
             "Jockey Ride Time": self.l4d2_infected_jockey_ridetime,
-            "Jockey Damage": self.l4d2_infected_jockey_damage,
             "Boomer Vomits": self.l4d2_infected_boomer_vomits,
             "Boomer Blinds": self.l4d2_infected_boomer_blinded,
             "Hunter Pounces": self.l4d2_infected_hunter_pounce_counter,
             "Hunter Pounce Damage": self.l4d2_infected_hunter_pounce_damage,
-            "Smoker Damage": self.l4d2_infected_smoker_damage,
-            "Tank Damage": self.l4d2_infected_tank_damage,
+            "Damage Dealt as Smoker": self.l4d2_infected_smoker_damage,
+            "Damage Dealt as Tank": self.l4d2_infected_tank_damage,
             "Tank Sniper": self.l4d2_infected_tanksniper,
-            "Spitter Damage": self.l4d2_infected_spitter_damage,
+            "Damage Dealt as Spitter": self.l4d2_infected_spitter_damage,
             "Spawns as Infected": self.l4d2_infected_spawn_1,
             "Spawns as Smoker": self.l4d2_infected_spawn_1,
             "Spawns as Boomer": self.l4d2_infected_spawn_2,
@@ -216,6 +220,28 @@ class UserStats(models.Model):
             "Spawns as Jockey": self.l4d2_infected_spawn_5,
             "Spawns as Charger": self.l4d2_infected_spawn_6,
             "Spawns as Tank": self.l4d2_infected_spawn_7,
+            "Survivors Incapped": self.l4d2_award_survivor_down,
+            "Bulldozed Survivors": self.l4d2_award_bulldozer,
+            "Rounds won as Infected": self.l4d2_award_infected_win,
+            "All Survivors in Safehouse as Survivor": self.l4d2_award_allinsafehouse,
+            "Witches Disturbed": self.l4d2_award_witchdisturb,
+            "Rescued Incapped Teammate": self.l4d2_award_rescue,
+            "Nice Pounces": self.l4d2_award_pounce_nice,
+            "Perfect Pounces": self.l4d2_award_pounce_perfect,
+            "Perfect Blindings": self.l4d2_award_perfect_blindness,
+            "Gascans Poured": self.l4d2_award_gascans_poured,
+            "Upgrades Added": self.l4d2_award_upgrades_added,
+            "Matador": self.l4d2_award_matador,
+            "Ledge Grabs": self.l4d2_award_ledgegrab,
+            "Fincaps": self.l4d2_award_upgrades_added,
+            "Campaigns Completed": self.l4d2_award_campaigns,
+            "Medkits Given": self.l4d2_award_medkit,
+            "Adrenalines Given": self.l4d2_award_adrenaline,
+            "Pills Given": self.l4d2_award_pills,
+            "Defibs Given": self.l4d2_award_defib,
+            "Protected Teammate": self.l4d2_award_protect,
+            "Revived Teammate": self.l4d2_award_revive,
+            "Scattering Ram Award": self.l4d2_award_scatteringram,
         }
 
     def gmodzs_stats(self):

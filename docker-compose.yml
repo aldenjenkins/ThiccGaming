@@ -70,7 +70,7 @@ services:
   # env_file:
   #   - ./mysql/l4dstats/environment.env
   # networks:
-  #   - mysql2_network
+  #   - mysql_network
 
 
   ## teamspeak:
@@ -119,8 +119,7 @@ services:
   #  - mysql-l4dstats
   # networks:
   #  - nginx_network
-  #  - mysql1_network
-  #  - mysql2_network
+  #  - mysql_network
 
 networks:
   nginx_network:
