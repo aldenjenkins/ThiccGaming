@@ -29,7 +29,7 @@
              {% if ban.user %}
                  {% if ban.user.user.forum_profile.avatar and ban.user.user.forum_profile.show_avatar %}
                         <a style = "float:right;" href="{% url 'djangobb:forum_profile' ban.user.user.username %}">
-                            <img src="{{ ban.user.user.forum_profile.avatar.url }}" width = "30px" alt="User Avatar" />
+                            <img src="{{ ban.user.user.forum_profile.avatar }}" width = "30px" alt="User Avatar" />
                         </a>
                 {% else %}
                     {% if forum_settings.GRAVATAR_SUPPORT and ban.user.user.forum_profile.show_avatar %}
@@ -215,7 +215,7 @@
                                         <td height="16" class="listtable_1">
                                             {% if ban.adminUser.user.forum_profile.avatar and ban.adminUser.user.forum_profile.show_avatar %}
                                                 <a href="{% url 'djangobb:forum_profile' ban.adminUser.user.username %}">
-                                                    <img src="{{ ban.adminUser.user.forum_profile.avatar.url }}" width = "20px" alt="User Avatar" />
+                                                    <img src="{{ ban.adminUser.user.forum_profile.avatar }}" width = "20px" alt="User Avatar" />
                                                 </a>
                                             {% else %}
                                                 {% if forum_settings.GRAVATAR_SUPPORT and ban.adminUser.user.forum_profile.show_avatar %}

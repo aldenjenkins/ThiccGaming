@@ -110,7 +110,7 @@ class Group(models.Model):
 
 @python_2_unicode_compatible
 class Admin(models.Model):
-    aid     = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='ban_admin', verbose_name=_('FooBar Admin'))
+    aid     = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='ban_admin', verbose_name=_('Thicc Admin'))
     user    = models.CharField(max_length=64, unique=True)
     authid  = models.CharField(max_length=64, unique=True)
     srv_group = models.ForeignKey(Group, related_name='ban_group', verbose_name=_('Group'))

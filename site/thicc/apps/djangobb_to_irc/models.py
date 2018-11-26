@@ -2,18 +2,18 @@ from djangobb_forum.models import Post
 from django.db.models.signals import post_save
 import socket
 
-SITE_URL = "https://foobargaming.com"
+SITE_URL = "http://thiccgaming.com"
 
-def sendMsg(msg):
-    s = socket.socket()
-    s.connect(("localhost", 6263))
-    s.send(msg)
-    s.shutdown(socket.SHUT_WR)
+#def sendMsg(msg):
+#    s = socket.socket()
+#    s.connect(("localhost", 6263))
+#    s.send(msg)
+#    s.shutdown(socket.SHUT_WR)
 
 def new_forum_post(sender, instance, created, **kwargs):
     if not created:
         return
-    channel = "#azelphur"
+    channel = "#thicc"
     if instance.topic.forum.category.name == "Staff area":
         channel = "#staff"
     if instance.topic.post_count == 1:
@@ -35,6 +35,6 @@ def new_forum_post(sender, instance, created, **kwargs):
             SITE_URL,
             instance.get_absolute_url()
         )
-    sendMsg(msg)
+    #sendMsg(msg)
 
 post_save.connect(new_forum_post, sender=Post)

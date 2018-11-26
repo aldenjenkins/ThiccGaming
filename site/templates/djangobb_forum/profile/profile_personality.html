@@ -10,6 +10,7 @@
 		<h3>{% trans "Personality Settings - "%}{{ profile }}</h3>
 		<form id="profile4" method="post">
 			{% csrf_token %}
+            {% comment %}
 			<div class="row">
 				<div class="col s12">
 					<h5>{% trans "Set your avatar display options" %}</h5>
@@ -23,7 +24,7 @@
 			<div class="row">
 				<div class="col s12 m6">
 					{% if profile.forum_profile.avatar %}
-						<img src="{{ profile.forum_profile.avatar.url }}" alt="User Avatar" class="left pad-right" />
+						<img src="{{ profile.forum_profile.avatar }}" width=100px alt="User Avatar" class="left pad-right" />
 					{% else %}
 						{% if forum_settings.GRAVATAR_SUPPORT %}
 							<img src="{% gravatar profile.email %}" alt="User Avatar" class="left pad-right" />
@@ -41,6 +42,7 @@
 				</div>
 			</div>
         <hr>
+        {% endcomment %}
 			<div class="row no-mar-bottom">
 				<div class="col s12">
 					<h5>{% trans "Set your Forum Signature" %}</h5>

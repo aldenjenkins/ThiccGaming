@@ -120,13 +120,67 @@ SITE_ID = os.getenv("SITE_ID")
 USE_I18N = False
 
 AUTHENTICATION_BACKENDS = (
-    "social.backends.steam.SteamOpenId",
+    # "social.backends.steam.SteamOpenId",
+    "social_core.backends.steam.SteamOpenId",
     # "social.backends.twitter.TwitterOAuth",
     # "social.backends.google.GoogleOAuth2",
     # "social.backends.github.GithubOAuth2",
     # "social.backends.facebook.FacebookOAuth2",
     # "social.backends.reddit.RedditOAuth2",
+    # POTENTIALLY UN COMMENT THIS. THIS WAS COMMENTED AFTER THE THICC GAMING CHANGE AND RIGHT BEFORE MAKING AUTH EXCLUSIVELY STEAM OAUTH. NOT SURE OF SIDE EFFECTS.    
     "mezzanine.core.auth_backends.MezzanineBackend",
+)
+
+SOCIAL_AUTH_STEAM_API_KEY = os.getenv('STEAM_KEY')
+
+SOCIAL_AUTH_PIPELINE = (
+    'thicc.core.custom_social_pipelines.dont_allow_authenticated_pipeline',
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+
+    # Checks if the current social-account is already associated in the site.
+    'social_core.pipeline.social_auth.social_user',
+
+    'thicc.core.custom_social_pipelines.require_email_pipeline',
+    #'social_core.pipeline.debug.debug',
+    'thicc.core.custom_social_pipelines.check_email_pipeline',
+    #'social_core.pipeline.debug.debug',
+    #'common.pipeline.require_country',
+    #'common.pipeline.require_city',
+
+    'social_core.pipeline.user.get_username',
+
+    # Send a validation email to the user to verify its email address.
+    # Disabled by default.
+    # 'social_core.pipeline.mail.mail_validation',
+
+
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'thicc.core.custom_social_pipelines.get_steam_avatar',
+    'thicc.core.custom_social_pipelines.link_to_existing_stat_object',
+    #'thicc.core.custom_social_pipelines.save_profile',
+)
+
+SOCIAL_AUTH_DISCONNECT_PIPELINE = (
+    'thicc.core.custom_social_pipelines.not_allowed_to_disconnect',
+
+    # Verifies that the social association can be disconnected from the current
+    # user (ensure that the user login mechanism is not compromised by this
+    # disconnection).
+    #'social_core.pipeline.disconnect.allowed_to_disconnect',
+
+    # Collects the social associations to disconnect.
+    #'social_core.pipeline.disconnect.get_entries',
+
+    # Revoke any access_token when possible.
+    #'social_core.pipeline.disconnect.revoke_tokens',
+
+    # Removes the social associations.
+    #'social_core.pipeline.disconnect.disconnect',
 )
 
 # The numeric mode to set newly-uploaded files to. The value should be
@@ -166,7 +220,7 @@ DATABASES = {
     }
 }
 
-RCON_PASSWORD = os.getenv('RCON_PASS', '')
+RCON_PASSWORD = os.getenv('RCON_PASSWORD', '')
 
 # APPEND_SLASH = False
 #########
@@ -193,9 +247,9 @@ STATIC_URL = "/static/"
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(PROJECT_ROOT, STATIC_URL.strip("/"))
 
-#STATICFILES_DIRS = [
-#    os.path.join(BASE_DIR, 'static'),
-#]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
 
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_BUCKET")
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
@@ -249,18 +303,19 @@ INSTALLED_APPS = (
     "mezzanine.galleries",
     "mezzanine.twitter",
     "mezzanine.accounts",
-    #thicc.apps. "mezzanine.mobile",
+    # thicc.apps. "mezzanine.mobile",
     "game_info",
     "rest_framework",
     "djangobb_forum",
-    "social.apps.django_app.default",
+    #"social.apps.django_app.default",
+    "social_django",
     "thicc.apps.donations",
     "paypal.standard.ipn",
     "nocaptcha_recaptcha",
     "thicc.apps.faq",
     "django_messages",
     "thicc.apps.social_auth_filter",
-    "thicc.apps.djangobb_to_irc",
+    #"thicc.apps.djangobb_to_irc",
     'thicc.apps.django_azelphurmotd',
     'thicc.apps.scape',
     'thicc.apps.bans',
@@ -273,13 +328,9 @@ apps = INSTALLED_APPS
 
 DEBUG_APPS = (
     'debug_toolbar',
+    #'django_pdb',
 )
 
-# # Django Hosts Conf
-# ROOT_HOSTCONF = 'game.hosts'
-# DEFAULT_HOST = 'ts'
-# DEFAULT_REDIRECT_URL = "http://facebook.com"
-# TEAMSPEAK_URL = "http://google.com"
 
 TEMPLATES = [
     {
@@ -300,8 +351,9 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "mezzanine.conf.context_processors.settings",
                 "mezzanine.pages.context_processors.page",
-                "social.apps.django_app.context_processors.backends",
-                "social.apps.django_app.context_processors.login_redirect",
+                #"social.apps.django_app.context_processors.backends",
+                #"social.apps.django_app.context_processors.login_redirect",
+                "social_django.context_processors.backends",
                 "thicc.apps.donations.processors.donations",
                 "game_info.processors.servers",
                 "djangobb_forum.context_processors.forum_settings",
@@ -343,14 +395,19 @@ MIDDLEWARE_CLASSES = (
     "djangobb_forum.middleware.LastLoginMiddleware",
     'djangobb_forum.middleware.UsersOnline',
     'djangobb_forum.middleware.TimezoneMiddleware',
-    #"django_hosts.middleware.HostsResponseMiddleware",
 )
+
 
 DEBUG_MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'django_pdb.middleware.PdbMiddleware',
+
 )
+
+
 def show_the_toolbar(request):
-    return request.user.id==1
+    return request.user.id == 1
+
 
 if DEBUG:
     INSTALLED_APPS = INSTALLED_APPS + DEBUG_APPS
@@ -403,6 +460,7 @@ HAYSTACK_CONNECTIONS = {
     }
 }
 
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
@@ -414,7 +472,7 @@ DATABASES = {
     }
 }
 
-PAYPAL_RECEIVER_EMAIL=os.getenv('PAYPAL_EMAIL', '')
+PAYPAL_RECEIVER_EMAIL = os.getenv('PAYPAL_EMAIL', '')
 
 DONATION_AMOUNTS = (
     # Amount, Days of premium
@@ -452,6 +510,9 @@ DJANGOBB_PM_SUPPORT = True
 
 DJANGOBB_ATTACHMENT_SIZE_LIMIT= 5000000
 
+SOCIAL_AUTH_STRATEGY = 'social_django.strategy.DjangoStrategy'
+SOCIAL_AUTH_STORAGE = 'social_django.models.DjangoStorage'
+
 # ACCOUNTS_VERIFICATION_REQUIRED = True
 
 
@@ -475,7 +536,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_PORT = 465
 
 # Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_HOST_USER = 'administration@foobargaming.com'
+EMAIL_HOST_USER = 'hello@thicc.io'
 EMAIL_HOST_PASSWORD = ''
 # EMAIL_USE_TLS = False
 # EMAIL_USE_SSL = True

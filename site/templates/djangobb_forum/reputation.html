@@ -8,7 +8,7 @@
 {% block content %}
     <div class="forum-head">
 		{% if profile.user.forum_profile.avatar and profile.user.forum_profile.show_avatar %}
-			<img src="{{ profile.user.forum_profile.avatar.url }}" alt="User Avatar" class="left" />
+			<img src="{{ profile.user.forum_profile.avatar }}" alt="User Avatar" class="left" />
 		{% else %}
 			{% if forum_settings.GRAVATAR_SUPPORT and profile.user.forum_profile.show_avatar %}
 				<img src="{% gravatar profile.user.email %}" alt="User Avatar" class="left" />
@@ -38,7 +38,7 @@
                 <div class="row">
                     <div class="col s12 m2">
                         {% if message.sender.forum_profile.avatar %}
-                            <a href="{% url 'djangobb:forum_profile' reputation.from_user %}"><img src="{{ reputation.from_user.forum_profile.avatar.url }}" alt="User Avatar" class="left avatar-small" /></a>
+                            <a href="{% url 'djangobb:forum_profile' reputation.from_user %}"><img src="{{ reputation.from_user.forum_profile.avatar }}" alt="User Avatar" class="left avatar-small" /></a>
                         {% else %}
                             {% if forum_settings.GRAVATAR_SUPPORT %}
                                 <a href="{% url 'djangobb:forum_profile' reputation.from_user %}"><img src="{% gravatar reputation.from_user.email %}" alt="User Avatar" class="left avatar-small" /></a>

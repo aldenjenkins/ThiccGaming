@@ -2,7 +2,8 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.db import IntegrityError
 from .models import Ban, Comment, Group, Admin
-from social.apps.django_app.default.models import UserSocialAuth
+#from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 
 def getSteam64FromString(steamid):
     steam64id = 76561197960265728  # I honestly don't know where
@@ -16,18 +17,19 @@ def getSteam64FromString(steamid):
         steam64id += 1
     return steam64id
 
+
 class BanForm(forms.ModelForm):
 
     sid = forms.ChoiceField(choices=(
-                (1, "Left 4 Dead 2" ),
-                (2, "FooBar Gaming | ZS"),
-                (3, "FooBar Scape"),
-                (4, "FooBar Gaming | JB"),
-                (5, "FooBar WoW")
+                (1, "Left 4 Dead 2"),
+                (2, "Thicc Gaming | ZS"),
+                # (3, "Thicc Scape"),
+                # (4, "Thicc Gaming | JB"),
+                # (5, "Thicc WoW")
             ))
 
     length = forms.ChoiceField(choices=(
-                (0, "Permanent" ),
+                (0, "Permanent"),
                 (1800, "30 Minutes"),
                 (3600, "1 Hour"),
                 (7200, "2 Hours"),

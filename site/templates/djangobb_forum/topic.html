@@ -109,7 +109,7 @@
 						{% if post.user.forum_profile.avatar and post.user.forum_profile.show_avatar %}
 							<dt class="forum-user-avatar">
                                 <a href="{% url 'djangobb:forum_profile' post.user.username %}">
-                                    <img src="{{ post.user.forum_profile.avatar.url }}" alt="User Avatar" />
+                                    <img src="{{ post.user.forum_profile.avatar }}" alt="User Avatar" />
                                 </a>
                             </dt>
 						{% else %}
@@ -151,9 +151,9 @@
 							{% if user != post.user and user.is_authenticated %}
                                 <dd class="forum-user-rep can-edit">
                                     <a href="{% url 'djangobb:reputation' post.user.username %}" data-tooltip="{% trans 'View user\'s Reputation' %}">{% trans "Rep" %}</a>:
-								    <a href="{% url 'djangobb:reputation' post.user.username %}?action=plus&amp;post_id={{ post.id }}" class="rep-add"><i class="fa fa-fw fa-thumbs-up"></i></a>
+								    <a href="{% url 'djangobb:give-reputation' post.user.username %}?action=plus&amp;post_id={{ post.id }}" class="rep-add"><i class="fa fa-fw fa-thumbs-up"></i></a>
 								    {{ post.user.forum_profile.reply_total|default_if_none:"0" }}
-								    <a href="{% url 'djangobb:reputation' post.user.username %}?action=minus&amp;post_id={{ post.id }}" class="rep-minus"><i class="fa fa-fw fa-thumbs-down"></i></a>
+								    <a href="{% url 'djangobb:give-reputation' post.user.username %}?action=minus&amp;post_id={{ post.id }}" class="rep-minus"><i class="fa fa-fw fa-thumbs-down"></i></a>
                                 </dd>
 							{% else %}
                                 <dd class="forum-user-rep">

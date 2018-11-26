@@ -19,10 +19,10 @@ urlpatterns = [
     url('^misc/$', forum_views.misc, name='misc'),
 
     # User
-    url('^user/(?P<username>.*)/upload_avatar/$', forum_views.upload_avatar, {
-        'form_class': UploadAvatarForm,
-        'template': 'djangobb_forum/upload_avatar.html'
-        }, name='forum_profile_upload_avatar'),
+    # url('^user/(?P<username>.*)/upload_avatar/$', forum_views.upload_avatar, {
+    #     'form_class': UploadAvatarForm,
+    #     'template': 'djangobb_forum/upload_avatar.html'
+    #     }, name='forum_profile_upload_avatar'),
     url('^user/(?P<username>.*)/privacy/$', forum_views.user, {
         'section': 'privacy',
         'form_class': PrivacyProfileForm,
@@ -93,7 +93,8 @@ if (forum_settings.LOFI_SUPPORT):
 # REPUTATION Extension
 if (forum_settings.REPUTATION_SUPPORT):
     urlpatterns += [
-        url('^reputation/(?P<username>.*)/$', forum_views.reputation, name='reputation'),
+        url('^give-reputation/(?P<username>.*)/$', forum_views.give_reputation, name='give-reputation'),
+        url('^reputation/(?P<username>.*)/$', forum_views.see_reputation, name='reputation'),
     ]
 
 # ATTACHMENT Extension

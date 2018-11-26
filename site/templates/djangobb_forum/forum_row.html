@@ -14,7 +14,7 @@
             {% if forum.last_post.topic %}
                 {% if forum.last_post.user.forum_profile.avatar and forum.last_post.user.forum_profile.show_avatar %}
                     <a href="{% url 'djangobb:forum_profile' forum.last_post.user.username %}" class="avatar">
-                        <img src="{{  forum.last_post.user.forum_profile.avatar.url }}" alt="User Avatar" />
+                        <img src="{{  forum.last_post.user.forum_profile.avatar }}" alt="User Avatar" />
                     </a>
                 {% else %}
                     {% if forum_settings.GRAVATAR_SUPPORT and forum.last_post.user.forum_profile.show_avatar %}
@@ -24,7 +24,7 @@
                     {% endif %}
                 {% endif %}
                 <a style="text-transform: capitalize;" href="{{ forum.last_post.get_absolute_url }}">{{ forum.last_post.topic }}</a><br />
-                <a style = "font-size:0.75em; text-overflow: ellipsis;"  href="{% url 'djangobb:forum_profile' forum.last_post.user.username %}">{{ forum.last_post.user.username|safe }}</a>, <time style = "font-size:0.75em;" datetime="{{ forum.last_post.created|date:'c' }}">{{ forum.last_post.created|date:'M d fA' }}</time>
+                <a style = "font-size:0.75em; text-overflow: ellipsis;"  href="{% url 'djangobb:forum_profile' forum.last_post.user.username %}">{{ forum.last_post.user.username|safe }}</a>, <time style = "font-size:0.75em;" datetime="{{ forum.last_post.created|date:'c' }}">{% age_or_time forum.last_post.created %}{% comment %} {% age_or_time forum.last_post.created|date:'M d fA' %}{% endcomment %}</time>
             {% endif %}
         {% endif %}
         </dd>
@@ -38,7 +38,7 @@
             {% if forum.last_post.topic %}
                 {% if forum.last_post.user.forum_profile.avatar and forum.last_post.user.forum_profile.show_avatar %}
                     <a href="{% url 'djangobb:forum_profile' forum.last_post.user.username %}" class="avatar">
-                        <img src="{{  forum.last_post.user.forum_profile.avatar.url }}" alt="User Avatar" />
+                        <img src="{{  forum.last_post.user.forum_profile.avatar }}" alt="User Avatar" />
                     </a>
                 {% else %}
                     {% if forum_settings.GRAVATAR_SUPPORT and forum.last_post.user.forum_profile.show_avatar %}
@@ -50,7 +50,7 @@
 {#                {% trans "By" %} <a href="{{ forum.last_post.get_absolute_url }}"><time datetime="{{ forum.last_post.created|date:'c' }}">{% forum_time forum.last_post.created %}</time></a><br />#}
                  <a style="text-transform: capitalize;" href="{{ forum.last_post.get_absolute_url }}">{{ forum.last_post.topic }}</a><br />
 
-                <a style = "font-size:0.75em; text-overflow: ellipsis;"  href="{% url 'djangobb:forum_profile' forum.last_post.user.username %}">{{ forum.last_post.user.username|safe }}</a>, <time style = "font-size:0.75em;" datetime="{{ forum.last_post.created|date:'c' }}">{{ forum.last_post.created|date:'M d fA' }}</time>
+                 <a style = "font-size:0.75em; text-overflow: ellipsis;"  href="{% url 'djangobb:forum_profile' forum.last_post.user.username %}">{{ forum.last_post.user.username|safe }}</a>, <time style = "font-size:0.75em;" datetime="{{ forum.last_post.created|date:'c' }}">{% age_or_time forum.last_post.created %}{% comment %} {% age_or_time forum.last_post.created|date:'M d fA' %}{% endcomment %}</time>
             {% endif %}
         {% endif %}
         </dd>

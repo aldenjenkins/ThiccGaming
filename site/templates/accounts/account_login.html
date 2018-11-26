@@ -12,9 +12,10 @@
         </div>
     {% else %}
        <div class="row">
-            <div class="col s12 m8">
+            <div class="col s12 " style="text-align:center;">
                 <div class="content-container">
-                    <h3>{% trans 'Log in' %}</h3>
+                    <h3>{% trans 'Log in with Steam' %}</h3>
+                    {% comment %}
                     {% errors_for form %}
                     <form method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                         {% fields_for form %}
@@ -27,8 +28,12 @@
                             {% endblock %}
                         </div>
                     </form>
+                    {% endcomment %}
+
+                    <a href="/login/steam/{% if next %}?next={{ next }}{% endif %}"><img style="vertical-align:middle;" src="https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_02.png" alt="{% trans 'Log In with Steam' %}"></a>
                 </div>
             </div>
+            {% comment %}
             <div class="col s12 m4">
                 <div class="content-container">
                     <h4>{% trans 'Or, log in with' %}</h4>
@@ -44,6 +49,7 @@
 {#                        </a>#}
                 </div>
             </div>
+            {% endcomment %}
         </div>
     {% endif %}
 {% endblock %}

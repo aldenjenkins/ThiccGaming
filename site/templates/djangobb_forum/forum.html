@@ -52,7 +52,7 @@
                         <dd class="forum-latest-mobile">
                             {% if topic.last_post.user.forum_profile.avatar and  topic.last_post.user.forum_profile.show_avatar %}
                                 <a href="{% url 'djangobb:forum_profile' topic.last_post.user.username %}" class="avatar">
-                                    <img src="{{  topic.last_post.user.forum_profile.avatar.url }}" alt="User Avatar" />
+                                    <img src="{{  topic.last_post.user.forum_profile.avatar }}" alt="User Avatar" />
                                 </a>
                             {% else %}
                                 {% if forum_settings.GRAVATAR_SUPPORT and  topic.last_post.user.forum_profile.show_avatar %}
@@ -71,7 +71,7 @@
                         <dd class="forum-latest">
                             {% if topic.last_post.user.forum_profile.avatar and  topic.last_post.user.forum_profile.show_avatar %}
                                 <a href="{% url 'djangobb:forum_profile' topic.last_post.user.username %}" class="avatar">
-                                    <img src="{{  topic.last_post.user.forum_profile.avatar.url }}" alt="User Avatar" />
+                                    <img src="{{  topic.last_post.user.forum_profile.avatar }}" alt="User Avatar" />
                                 </a>
                             {% else %}
                                 {% if forum_settings.GRAVATAR_SUPPORT and  topic.last_post.user.forum_profile.show_avatar %}

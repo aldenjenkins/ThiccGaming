@@ -14,7 +14,7 @@
         <div class="messages-user-detail">
             {% if message.sender.forum_profile.avatar and message.sender.forum_profile.show_avatar %}
                 <a href="{% url 'djangobb:forum_profile' message.sender %}" class="forum-username">
-                    <img src="{{ message.sender.forum_profile.avatar.url }}" alt="User Avatar" class="left avatar-messages" />
+                    <img src="{{ message.sender.forum_profile.avatar }}" alt="User Avatar" class="left avatar-messages" />
                 </a>
             {% else %}
                 {% if forum_settings.GRAVATAR_SUPPORT and message.sender.forum_profile.show_avatar %}

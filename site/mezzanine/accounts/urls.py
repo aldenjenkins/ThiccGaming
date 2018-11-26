@@ -30,19 +30,19 @@ urlpatterns = [
         views.login, name="login"),
     url("^%s%s$" % (LOGOUT_URL.strip("/"), _slash),
         views.logout, name="logout"),
-    url("^%s%s$" % (SIGNUP_URL.strip("/"), _slash),
-        views.signup, name="signup"),
-    url("^%s%s%s$" % (SIGNUP_VERIFY_URL.strip("/"), _verify_pattern, _slash),
-        views.signup_verify, name="signup_verify"),
+    # url("^%s%s$" % (SIGNUP_URL.strip("/"), _slash),
+    #     views.signup, name="signup"),
+    # url("^%s%s%s$" % (SIGNUP_VERIFY_URL.strip("/"), _verify_pattern, _slash),
+    #     views.signup_verify, name="signup_verify"),
     # url("^%s%s$" % (PROFILE_UPDATE_URL.strip("/"), _slash),
     #     views.profile_update, name="profile_update"),
-    url("^%s%s$" % (PASSWORD_RESET_URL.strip("/"), _slash),
-        views.password_reset, name="mezzanine_password_reset"),
-    url("^%s%s%s$" %
-        (PASSWORD_RESET_VERIFY_URL.strip("/"), _verify_pattern, _slash),
-        views.password_reset_verify, name="password_reset_verify"),
-    url("^%s%s$" % (ACCOUNT_URL.strip("/"), _slash),
-        views.account_redirect, name="account_redirect"),
+    # url("^%s%s$" % (PASSWORD_RESET_URL.strip("/"), _slash),
+    #     views.password_reset, name="mezzanine_password_reset"),
+    # url("^%s%s%s$" %
+    #     (PASSWORD_RESET_VERIFY_URL.strip("/"), _verify_pattern, _slash),
+    #     views.password_reset_verify, name="password_reset_verify"),
+    # url("^%s%s$" % (ACCOUNT_URL.strip("/"), _slash),
+    #     views.account_redirect, name="account_redirect"),
 ]
 
 if settings.ACCOUNTS_PROFILE_VIEWS_ENABLED:

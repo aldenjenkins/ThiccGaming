@@ -1,6 +1,6 @@
 {% load i18n accounts_tags %}
 {% block main %}
-{% blocktrans %} Thanks for creating your FooBarGaming.com account.{% endblocktrans %}
+{% blocktrans %} Thanks for creating your ThiccGaming.com account.{% endblocktrans %}
 {% trans "Please use the link below to activate it." %}
 https://{{ request.get_host }}{{ verify_url }}
 {% endblock %}

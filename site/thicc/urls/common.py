@@ -5,6 +5,8 @@ from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
+from django.views.i18n import set_language
+
 
 from mezzanine.core.views import direct_to_template
 from mezzanine.blog.views import blog_post_list
@@ -14,6 +16,7 @@ from django.contrib.auth.views import password_change
 from thicc.apps.django_azelphurmotd.views import radio, staff
 from django.conf.urls.static import static
 
+from thicc.core import custom_social_pipelines as custom_social_views
 
 admin.autodiscover()
 
@@ -27,18 +30,20 @@ urlpatterns = i18n_patterns(
     url("^adminpageforyouandme/", include(admin.site.urls)),
     url(r'^game_info/', include('game_info.urls')),
     url(r'^donate/', include('thicc.apps.donations.urls')),
-    url(r'^forum/user/(?P<username>.*)/social/$', login_required(TemplateView.as_view(template_name='profile_social.html'))),
+    # url(r'^forum/user/(?P<username>.*)/social/$', login_required(TemplateView.as_view(template_name='profile_social.html'))),
     url(r'^forum/', include('djangobb_forum.urls', namespace='djangobb')),
     url(r'^messages/', include('django_messages.urls')),
     url(r'^paypal/', include('paypal.standard.ipn.urls')),
     url(r'^faq/', include('thicc.apps.faq.urls')),
-    url(
-        r'^accounts/password_change/',
-        password_change,
-        {'post_change_redirect': '/forum', 'template_name': 'accounts/password_change.html'},
-        name='account_change_password'
-    ),
-    url('', include('social.apps.django_app.urls', namespace='social')),
+    # url(
+    #     r'^accounts/password_change/',
+    #     password_change,
+    #     {'post_change_redirect': '/forum', 'template_name': 'accounts/password_change.html'},
+    #     name='account_change_password'
+    # ),
+    url(r'^email/$', custom_social_views.require_email, name='require_email'),
+    url('', include('social_django.urls')),
+    #url('', include('social.apps.django_app.urls', namespace='social')),
     # Temp Ingame Pages
     url(r'^rules/ingame/tf2/$', TemplateView.as_view(template_name='ingame/tf2/rules.html')),
     url(r'^radio/ingame/tf2/$', radio),
@@ -46,7 +51,7 @@ urlpatterns = i18n_patterns(
     url(r'^staff/ingame/tf2/$', staff),
     url(r'^news/ingame/tf2/$', TemplateView.as_view(template_name='ingame/tf2/news.html')),
     url(r'^howtosurf/ingame/tf2/$', TemplateView.as_view(template_name='ingame/tf2/howtosurf.html')),
-    #url(r'^chat/', TemplateView.as_view(template_name='ingame/tf2/howtosurf.html')),
+    # url(r'^chat/', TemplateView.as_view(template_name='ingame/tf2/howtosurf.html')),
     url(r'^l4d2/', include('thicc.apps.l4d2.urls')),
     url(r'^gmod/', include('thicc.apps.gmod.urls')),
     url(r'^wow/', include('thicc.apps.wow.urls')),
@@ -76,7 +81,7 @@ urlpatterns += [
     # one homepage pattern, so if you use a different one, comment this
     # one out.
 
-    #url("^$", direct_to_template, {"template": "index.html"}, name="home"),
+    # url("^$", direct_to_template, {"template": "index.html"}, name="home"),
 
     # HOMEPAGE AS AN EDITABLE PAGE IN THE PAGE TREE
     # ---------------------------------------------

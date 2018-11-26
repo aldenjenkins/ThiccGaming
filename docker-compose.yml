@@ -85,41 +85,40 @@ services:
   ##    - /data/teamspeak3:/var/ts3server/
   ##  restart: always
   
-  l4d2:
-    build: ./game-servers/l4d2
-    depends_on:
-      - mysql-site
-    volumes:
-      - ./game-servers/l4d2/addons:/opt/l4d2/left4dead2/addons
-      - ./game-servers/l4d2/cfg:/opt/l4d2/left4dead2/cfg
-      - ./game-servers/l4d2/steam_appid.txt:/opt/l4d2/steam_appid.txt
-      - ./game-servers/l4d2/host.txt:/opt/l4d2/left4dead2/host.txt
-      - ./game-servers/l4d2/motd.txt:/opt/l4d2/left4dead2/motd.txt
-    restart: always
-    ports:
-      - "27000-27050:27000-27050/udp"
-      - "27000-27050:27000-27050"
-    networks:
-      - mysql_network
-    command: /opt/l4d2/srcds_run -game left4dead2 -secure -console -usercon -ip 0.0.0.0 
-
-
-  # phpmyadmin:
-  # image: phpmyadmin/phpmyadmin
-  # container_name: phpmyadmin
-  # environment:
-  #  - PMA_ARBITRARY=1
+  # l4d2:
+  # build: ./game-servers/l4d2
+  # depends_on:
+  #   - mysql-site
+  # volumes:
+  #   - ./game-servers/l4d2/addons:/opt/l4d2/left4dead2/addons
+  #   - ./game-servers/l4d2/cfg:/opt/l4d2/left4dead2/cfg
+  #   - ./game-servers/l4d2/steam_appid.txt:/opt/l4d2/steam_appid.txt
+  #   - ./game-servers/l4d2/host.txt:/opt/l4d2/left4dead2/host.txt
+  #   - ./game-servers/l4d2/motd.txt:/opt/l4d2/left4dead2/motd.txt
   # restart: always
   # ports:
-  #  - 8080:80
-  # volumes:
-  #  - /sessions
-  # depends_on: 
-  #  - mysql-site
-  #  - mysql-l4dstats
+  #   - "27000-27050:27000-27050/udp"
+  #   - "27000-27050:27000-27050"
   # networks:
-  #  - nginx_network
-  #  - mysql_network
+  #   - mysql_network
+  # command: /opt/l4d2/srcds_run -game left4dead2 -secure -console -usercon -ip 0.0.0.0 
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+     - PMA_ARBITRARY=1
+    restart: always
+    ports:
+     - 8080:80
+    volumes:
+     - /sessions
+    depends_on: 
+     - mysql-site
+    networks:
+     - nginx_network
+     - mysql_network
 
 networks:
   nginx_network:

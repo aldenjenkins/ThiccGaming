@@ -618,7 +618,7 @@ def user(request, username, section='essentials', action=None, template='djangob
 
 @login_required
 @transaction.atomic
-def reputation(request, username):
+def give_reputation(request, username):
     user = get_object_or_404(User, username=username)
     form = build_form(ReputationForm, request, from_user=request.user, to_user=user)
 
@@ -653,11 +653,15 @@ def reputation(request, username):
             return HttpResponseRedirect(post.get_absolute_url())
         else:
             return render(request, 'djangobb_forum/reputation_form.html', {'form': form})
-    else:
-        reputations = Reputation.objects.filter(to_user__id=user.id).order_by('-time').select_related()
-        return render(request, 'djangobb_forum/reputation.html', {'reputations': reputations,
-                'profile': user.forum_profile,
-               })
+
+
+def see_reputation(request, username):
+    user = get_object_or_404(User, username=username)
+    reputations = Reputation.objects.filter(to_user__id=user.id).order_by('-time').select_related()
+    return render(request, 'djangobb_forum/reputation.html',
+                  {'reputations': reputations,
+                   'profile': user.forum_profile,
+                   })
 
 
 def show_post(request, post_id):

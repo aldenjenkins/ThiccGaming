@@ -16,12 +16,15 @@ from django.utils.six.moves.urllib.parse import urlencode
 
 from djangobb_forum.models import Report
 from djangobb_forum import settings as forum_settings
+from datetime import datetime, timedelta
+from django.utils.timesince import timesince
 
 
 register = template.Library()
 
 # TODO:
 # * rename all tags with forum_ prefix
+
 
 @register.filter
 def profile_link(user):
@@ -243,3 +246,15 @@ def url_replace(request, field, value):
     dict_ = request.GET.copy()
     dict_[field] = value
     return dict_.urlencode()
+
+
+@register.simple_tag(takes_context=True)
+def age_or_time(context, value):
+    now = timezone.now()
+    difference = now - value
+    # show year value only if not current year
+    if difference >= timedelta(days=30):
+        if value.year != now.year:
+            return value.strftime("%b %d, %I:%M%p %Y")
+        return value.strftime("%b %d, %I:%M%p")
+    return '%(time)s ago' % {'time': timesince(value)}  # .split(', ')[0]}

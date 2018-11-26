@@ -1,6 +1,7 @@
 # coding: utf-8
 from django.shortcuts import render, get_object_or_404
-from social.apps.django_app.default.models import UserSocialAuth
+#from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 from djangobb_forum.models import Profile
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -105,7 +106,7 @@ def search(request):
             if count == 0:
                 messages.error(request, _("This user does not exist."))
                 return render(request, 'bans/ban_search.html')
-            messages.warning(request, _("This user's STEAM account is not linked to a FooBar Gaming Account."))
+            messages.warning(request, _("This user's STEAM account is not linked to a Thicc Gaming Account."))
 
         if count == 0:
             messages.warning(request, _("This user has no previous bans."))
@@ -151,7 +152,7 @@ def parseBan(ban):
         socialAuthUserID = UserSocialAuth.objects.get(uid=ban.authid).user_id
         ban.user = Profile.objects.get(user_id=socialAuthUserID)
     except UserSocialAuth.DoesNotExist:
-        ban.nouser = "STEAM account not linked to a FooBar Gaming account."
+        ban.nouser = "STEAM account not linked to a Thicc Gaming account."
 
     # Format the ban's length
     c = ban.length

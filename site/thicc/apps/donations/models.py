@@ -7,7 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import Group
 from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
-from social.apps.django_app.default.models import UserSocialAuth
+#from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 from djangobb_forum.models import Profile
 from game_info.models import Server
 from valve.source.rcon import RCON

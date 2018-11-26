@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from djangobb_forum.models import Profile
-from social.apps.django_app.default.models import UserSocialAuth
+#from social.apps.django_app.default.models import UserSocialAuth
+
+from social_django.models import UserSocialAuth
 
 
 # Base steam id as shown at https://forums.alliedmods.net/showthread.php?t=60899
@@ -108,6 +110,7 @@ class UserStats(models.Model):
     l4d2_kill_spitter = models.IntegerField(blank=True, default=0)
     l4d2_kill_charger = models.IntegerField(blank=True, default=0)
     l4d2_kill_jockey = models.IntegerField(blank=True, default=0)
+    l4d2_kill_smoker = models.IntegerField(blank=True, default=0)
     l4d2_kill_tank = models.IntegerField(blank=True, default=0)
     l4d2_infected_jockey_ridetime = models.FloatField(blank=True, default=0)
     l4d2_infected_jockey_rides = models.IntegerField(blank=True, default=0)
@@ -127,7 +130,7 @@ class UserStats(models.Model):
     l4d2_infected_spawn_4 = models.IntegerField("Spawned as Spitter", blank=True, default=0)
     l4d2_infected_spawn_5 = models.IntegerField("Spawned as Jockey", blank=True, default=0)
     l4d2_infected_spawn_6 = models.IntegerField("Spawned as Charger", blank=True, default=0)
-    l4d2_infected_spawn_7 = models.IntegerField("Spawned as Tank", blank=True, default=0)
+    l4d2_infected_spawn_8 = models.IntegerField("Spawned as Tank", blank=True, default=0)
     l4d2_award_survivor_down = models.IntegerField(blank=True, default=0)
     l4d2_award_bulldozer = models.IntegerField(blank=True, default=0)
     l4d2_award_infected_win = models.IntegerField(blank=True, default=0)
@@ -200,6 +203,7 @@ class UserStats(models.Model):
             "Boomers Killed": self.l4d2_kill_boomer,
             "Spitters Killed": self.l4d2_kill_spitter,
             "Jockeys Killed": self.l4d2_kill_jockey,
+            "Smokers Killed": self.l4d2_kill_smoker,
             "Damage Dealt as Jockey": self.l4d2_infected_jockey_damage,
             "Charger Impacts": self.l4d2_charger_impacts,
             "Damage Dealt as Charger": self.l4d2_infected_charger_damage,
@@ -219,7 +223,7 @@ class UserStats(models.Model):
             "Spawns as Spitter": self.l4d2_infected_spawn_4,
             "Spawns as Jockey": self.l4d2_infected_spawn_5,
             "Spawns as Charger": self.l4d2_infected_spawn_6,
-            "Spawns as Tank": self.l4d2_infected_spawn_7,
+            "Spawns as Tank": self.l4d2_infected_spawn_8,
             "Survivors Incapped": self.l4d2_award_survivor_down,
             "Bulldozed Survivors": self.l4d2_award_bulldozer,
             "Rounds won as Infected": self.l4d2_award_infected_win,

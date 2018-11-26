@@ -7,7 +7,7 @@
             {% if not comment.is_removed and comment.is_public or request.user.is_staff %}
                 {% if comment.user.forum_profile.avatar and comment.user.forum_profile.show_avatar %}
                     <a href="{% url 'djangobb:forum_profile' comment.user.username %}" class="comment-user">
-                        <img class="comment-image" src="{{ comment.user.forum_profile.avatar.url }}" alt="User Avatar" class="left avatar-messages" />
+                        <img class="comment-image" src="{{ comment.user.forum_profile.avatar }}" alt="User Avatar" class="left avatar-messages" />
                     </a>
                 {% else %}
                     {% if forum_settings.GRAVATAR_SUPPORT and comment.user.forum_profile.show_avatar %}

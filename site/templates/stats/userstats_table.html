@@ -17,15 +17,15 @@
                 {# User & Photo #}
                 {% if stat.linked_steam %}
                     {% if stat.linked_steam.user.forum_profile.avatar and stat.linked_steam.user.forum_profile.show_avatar %}
-                        <a  href="{% url 'djangobb:forum_profile' stat.user.user.username %}">
-                        <img src="{{ stat.linked_steam.user.forum_profile.avatar.url }}" width = "30px" style="vertical-align:middle;" alt="User Avatar" />
-                        <b>{{ stat.linked_steam.user.username }}</b>
+                        <a  href="{% url 'djangobb:forum_profile' stat.linked_steam.user.username %}">
+                        <img src="{{ stat.linked_steam.user.forum_profile.avatar }}" width = "30px" style="vertical-align:middle;" alt="User Avatar" />
+                        {{ stat.linked_steam.user.username }}
                         </a>
                     {% else %}
-                        {% if forum_settings.GRAVATAR_SUPPORT and stat.user.user.forum_profile.show_avatar %}
+                        {% if forum_settings.GRAVATAR_SUPPORT and stat.linked_steam.user.forum_profile.show_avatar %}
                             <a href="{% url 'djangobb:forum_profile' stat.linked_steam.user.username %}">
                             <img src="{% gravatar stat.linked_steam.user.email %}" width = "30px" style="vertical-align:middle;" alt="User Avatar" />
-                            <b>{{ stat.linked_steam.user.username }}</b>
+                            {{ stat.linked_steam.user.username }}
                             </a>
                         {% endif %}
                     {% endif %}

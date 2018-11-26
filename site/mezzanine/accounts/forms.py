@@ -135,23 +135,32 @@ class ProfileForm(Html5Mixin, forms.ModelForm):
             pass
 
     # def binary_search(item):
-    #     fp = open('spamDomains.txt')
-    #     fp.seek(0, 2)
-    #     begin = 0
-    #     end = fp.tell()
-    #     while (begin < end):
-    #         fp.seek((end - begin) / 2, 0)
-    #         fp.readline()
-    #         line_key = get_key(fp.readline())
-    #         if (item == line_key):
-    #             found = True
-    #             break
-    #         elif (item > line_key):
-    #             begin = fp.tell()
-    #         else:
-    #             end = fp.tell()
-    #     fp.close()
-    #     return found
+    #    fp = open('spamdomains.txt')
+    #    fp.seek(0, 2)
+    #    begin = 0
+    #    end = fp.tell()
+    #    while (begin < end):
+    #        fp.seek((end - begin) / 2, 0)
+    #        fp.readline()
+    #        line_key = get_key(fp.readline())
+    #        if (item == line_key):
+    #            found = True
+    #            break
+    #        elif (item > line_key):
+    #            begin = fp.tell()
+    #        else:
+    #            end = fp.tell()
+    #    fp.close()
+    #    return found
+
+    def linear_search_domain(self, item):
+        fp = open('spamdomains.txt')
+        for line in fp:
+            if item == line.strip("\n"):
+                return True
+        return False
+
+
 
 
     def clean_username(self):
@@ -209,13 +218,13 @@ class ProfileForm(Html5Mixin, forms.ModelForm):
             raise forms.ValidationError(
                 ugettext("This email is invalid"))
 
-        if lch(secondPart):
+        if self.linear_search_domain(secondPart):
             raise forms.ValidationError(
                 ugettext("This email is invalid"))
 
         qs = User.objects.exclude(id=self.instance.id).filter(email=email)
 
-        if len(qs) == 0 :
+        if len(qs) == 0:
             return email
         raise forms.ValidationError(
                                 ugettext("This email is already registered"))

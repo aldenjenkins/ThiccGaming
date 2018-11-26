@@ -27,6 +27,7 @@
 					<label for="id_email">{{ form.email.label }}</label>
 				</div>
 			</div>
+            {% comment %}
 			<div class="row no-mar-bottom">
 				<div class="col s12 pad-bottom">
 					{% if user.is_superuser %}
@@ -36,6 +37,7 @@
 					{% endif %}
 				</div>
 			</div>
+            {% endcomment %}
 			<div class="row no-mar-bottom">
 				<div class="col s12 input-field">
 					{{ form.time_zone.errors }}

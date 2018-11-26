@@ -5,35 +5,35 @@
         {% for server in game_info %}
             <li data-serverid="{{ server.id }}" class="server-block">
                 {% if server.up %}
-                    {% if "Scape" in server.title %}
+                {% comment %} {# {% if "Scape" in server.title %}
                         <div class="server-status online">{% trans 'Online' %}</div>
                         <div class="server-info">
                             <div class="server-info-name"><a href="/scape/" data-tooltip="{% trans 'View the Portal Page' %}">{{ server.title|default:'Unknown' }}</a></div>
                             <div class="server-info-players">{{ server.info.player_count|default:'0' }} / 500 </div>
-                        </div>
-                    {% else %}
+                        </div> 
+                        {% else %} #}{% endcomment %}
                         <div class="server-status online">{% trans 'Online' %}</div>
                         <div class="server-info">
                             <div class="server-info-name"><a href="steam://connect/{{ server.host }}:{{ server.port }}" rel="nofollow" data-tooltip="{% trans 'Connect to this server' %}">{{ server.title|default:'Unknown' }}</a></div>
                             <div class="server-info-map">{{ server.info.map|default:'Unknown' }}</div>
                             <div class="server-info-players">{{ server.info.player_count }} / {{ server.info.max_players|default:'0' }}</div>
                         </div>
-                    {% endif %}
+                    {#{% endif %}#}
                 {% else %}
-                    {% if "Scape" in server.title %}
+                    {% comment %} {#{% if "Scape" in server.title %}
                         <div class="server-status online">{% trans 'Online' %}</div>
                         <div class="server-info">
                             <div class="server-info-name"><a href="/scape/" data-tooltip="{% trans 'View the Portal Page' %}">{{ server.title|default:'Unknown' }}</a></div>
                             <div class="server-info-players">{{ server.info.player_count|default:'0' }} / 500 </div>
                         </div>
-                    {% else %}
+                     {% else %}#}{% endcomment %}
                         <div class="server-status offline">{% trans 'Offline' %}</div>
                         <div class="server-info">
                             <div class="server-info-name">{{ server.title }}</div>
                             <div class="server-info-map">{% trans 'N/A' %}</div>
                             <div class="server-info-players">0 / 0</div>
                         </div>
-                    {% endif %}
+                        {#{% endif %}#} 
                 {% endif %}
                 <div class="clearfix"></div>
             </li>
