@@ -136,8 +136,13 @@ def get_steam_avatar(backend, strategy, details, response, user=None, *args, **k
 
 
 def link_to_existing_stat_object(backend, strategy, details, response, user=None, social=None, is_new=False, request=None, *args, **kwargs):
-    stats_object = UserStats.objects.filter(steam64=social.uid)[0]
-    if stats_object:
+    try:
+
+        stats_object = UserStats.objects.get(steam64=social.uid)
+    except UserStats.DoesNotExist:
+        messages.success(strategy.request, _("Successfullly Logged In"))
+        return
+    else:
         stats_object.linked_steam = social
         stats_object.save()
         if is_new:
