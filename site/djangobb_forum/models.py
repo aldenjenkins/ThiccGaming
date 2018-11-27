@@ -317,6 +317,8 @@ class Profile(models.Model):
     auto_subscribe = models.BooleanField(_('Auto subscribe'), help_text=_("Auto subscribe all topics you have created or reply."), blank=True, default=True)
     markup = models.CharField(_('Default markup'), max_length=15, default=forum_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
+    email_unsubscribed = models.BooleanField(_("Is Unsubscribed to Emails"), blank=True, default=False)
+    email_verified = models.BooleanField(_("Is Email verified"), blank=True, default=False)
 
     objects = ProfileManager()
 

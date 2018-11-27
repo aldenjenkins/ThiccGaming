@@ -165,3 +165,42 @@ def password_reset_verify(request, uidb36=None, token=None):
     else:
         error(request, _("The link you clicked is no longer valid."))
         return redirect("/forum")
+
+from django.http import Http404
+from django.template import RequestContext
+def unsubscribe(request, uuid, token, template='unsubscribe.html',
+                extra_context=None):
+
+    user = get_object_or_404(User, uuid=uuid)
+    if user.email_unsubscribed:
+        return render_to_response(template, context={'unsubbed_user': user})
+
+    the_token = get_token_for_user(user)
+    if not token == the_token:
+        raise Http404
+
+
+    user.email_verified=True
+    user.email_unsubscribed = True
+    user.save()
+
+    return render_to_response(template, context={'unsubbed_user': user})
+
+
+from thicc.core.custom_social_pipelines import get_token_for_user
+from django.shortcuts import render_to_response
+def verify_email(request, uuid, token, template='verify_email.html',
+                extra_context=None):
+
+    user = get_object_or_404(User, uuid=uuid)
+    if user.email_verified:
+        return render_to_response('already_verified_email.html', context={'verified_user': user})
+
+    the_token = get_token_for_user(user)
+    if not token == the_token:
+        raise Http404
+
+    user.email_verified=True
+    user.save()
+
+    return render_to_response(template, context={'verified_user': user})

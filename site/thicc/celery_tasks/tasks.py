@@ -5,13 +5,11 @@ from celery import Celery, shared_task
 # current_app.conf.CELERY_ALWAYS_EAGER = True
 # current_app.conf.CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 from django.conf import settings
-from apns2 import client as apns2_client
-from apns2 import errors as apns2_errors
-from apns2 import payload as apns2_payload
 from .celery_app import app
 from django.db.models import Count
 from django.core.mail import send_mail
-import datetime
+from game_info.models import Server
+
 
 #from twilio.rest import Client
 #client = Client()
@@ -27,8 +25,8 @@ def update_game_server_info():
             server.update_rules()
 
 @app.task(ignore_result=True)
-def send_email(user_id,title, message):
-    user = Account.objects.get(pk=user_id)
+def send_email(user_id, title, message):
+    user = settings.AUTH_USER_MODEL.objects.get(pk=user_id)
     send_mail(user, title, message)
 
 #@app.task(ignore_result=True)

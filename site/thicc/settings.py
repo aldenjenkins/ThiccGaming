@@ -522,41 +522,20 @@ SOCIAL_AUTH_STORAGE = 'social_django.models.DjangoStorage'
 FILE_UPLOAD_TEMP_DIR = MEDIA_ROOT + "temp/"
 
 
-
 # The email backend to use. For possible shortcuts see django.core.mail.
 # The default is to use the SMTP backend.
 # Third-party backends can be specified by providing a Python path
 # to a module that defines an EmailBackend class.
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-# # Host for sending email.
-# EMAIL_HOST = 'smtp.zoho.com'
-#
-# # Port for sending email.
-# EMAIL_PORT = 465
-
-# Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_HOST_USER = 'hello@thicc.io'
-EMAIL_HOST_PASSWORD = ''
-# EMAIL_USE_TLS = False
-# EMAIL_USE_SSL = True
-# EMAIL_SSL_CERTFILE = None
-# EMAIL_SSL_KEYFILE = None
-# EMAIL_TIMEOUT = None
-
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
-OWNER_EMAIL = os.getenv("OWNER_EMAIL")
-
+EMAIL_BACKEND = 'django_amazon_ses.EmailBackend'
 # Default email address to use for various automated correspondence from
 # the site managers.
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+DEFAULT_FROM_EMAIL = os.getenv("MAIL_FROM")
+
+OWNER_EMAIL = os.getenv("OWNER_EMAIL")
 
 # Subject-line prefix for email messages send with django.core.mail.mail_admins
 # or ...mail_managers.  Make sure to include the trailing space.
-EMAIL_SUBJECT_PREFIX = '[Django] '
+#EMAIL_SUBJECT_PREFIX = '[Django] '
 
 AVATAR_ALLOWED_FILE_EXTS = (
                             ".png",

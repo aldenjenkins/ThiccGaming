@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
+from django.core.mail import send_mail
 from django.utils.translation import ugettext as _
 from social_django.utils import psa, load_strategy
 from django.shortcuts import render
@@ -11,6 +12,9 @@ from djangobb_forum.models import Profile, PostTracking
 from functools import wraps
 from mezzanine.accounts.forms import linear_search
 from thicc.apps.stats.models import UserStats
+from django.template.loader import get_template
+from django.core.mail import BadHeaderError, EmailMultiAlternatives
+import hashlib
 
 
 def is_authenticated(user):
@@ -140,3 +144,35 @@ def link_to_existing_stat_object(backend, strategy, details, response, user=None
             messages.info(strategy.request, _("We have all of your \
                                              stats from previous games you've played on our servers. Check them out!"))
     messages.success(strategy.request, _("Successfullly Logged In"))
+
+
+def get_token_for_user(user):
+    # TODO: use USERNAME_FIELD instead
+    user_uuid = str(user.uuid).encode('utf-8')
+    secret = settings.SECRET_KEY.encode('utf-8')
+    return hashlib.md5(user_uuid + secret).hexdigest()
+
+def send_welcome_mail(backend, strategy, details, response, user=None, social=None, is_new=False, request=None, *args, **kwargs):
+    if is_new:
+        user = kwargs['user']
+
+        subject = 'Welcome to Thicc Gaming!'
+        from_email = 'hello@thicc.io'
+        to = user.email
+        plaintext = get_template('email_templates/welcome.txt')
+        html = get_template('email_templates/welcome.html')
+
+        d = {'first_name': user.first_name,
+             'uuid': user.uuid,
+             'token': get_token_for_user(user)}
+
+        text_content = plaintext.render(d)
+        html_content = html.render(d)
+
+        try:
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except BadHeaderError:
+            user.email_unsubscribed=True
+            user.save()
