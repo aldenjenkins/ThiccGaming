@@ -22,6 +22,7 @@ class OverExtendsNode(ExtendsNode):
     allows templates to be created in a project that extend their app
     template counterparts, or even app templates that extend other app
     templates with the same relative name/path.
+
     We use our own version of ``find_template``, that uses an explict
     list of template directories to search for the template, based on
     the directories that the known template loaders
@@ -30,6 +31,7 @@ class OverExtendsNode(ExtendsNode):
     absolute path gets removed from the list, so that subsequent
     searches for the same relative name/path can find parent templates
     in other directories, which allows circular inheritance to occur.
+
     Django's ``app_directories``, ``filesystem``, and ``cached``
     loaders are supported. The ``eggs`` loader, and any loader that
     implements ``load_template_source`` with a source string returned,

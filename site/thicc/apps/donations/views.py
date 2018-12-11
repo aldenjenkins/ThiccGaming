@@ -6,7 +6,11 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
 from .forms import DonateForm
 from .models import PremiumDonation
+from django.db.models import F, Sum, OuterRef
+from django.db.models.expressions import RawSQL
 import uuid
+from paypal.standard.ipn.models import PayPalIPN
+
 
 class DonateView(FormView):
     template_name = 'donations/donate.html'
@@ -32,7 +36,30 @@ class DonateView(FormView):
                 context['donation'] = None
         else:
             context['donation'] = None
+        #payments = PayPalIPN.objects.filter( 
+        #            custom=OuterRef('user__social_auth__uid'),
+        #            payment_status='Completed',
+        #        ).aggregate(total=Sum('mc_gross'))['total']
+        context['recent_donations'] = PremiumDonation \
+            .objects.all() \
+            .order_by('-updated_at')[:10] \
+            .select_related('user__forum_profile') \
+            .prefetch_related('user__social_auth') 
+
+        for don in context['recent_donations']:
+
+            don.total_donated = PayPalIPN \
+                .objects.filter(
+                    custom=don.user.social_auth.first().uid
+                ).aggregate(Sum('mc_gross'))['mc_gross__sum'] 
+
+            # Don't need to try catch here because these donations must have a paypal
+            # object created during its creation.
+            don.latest_donation = PayPalIPN \
+                .objects.filter(custom=don.user.social_auth.first().uid)[0].mc_gross
+
         return context
+
 
     def _get_steam(self):
         if self.request.user.is_authenticated():

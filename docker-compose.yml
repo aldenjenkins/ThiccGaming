@@ -3,28 +3,36 @@ version: "2"
 services:
   nginx:
     restart: always
-    image: nginx:1.13
+    # build: ./nginx/
+    # image: nginx:1.13
+    image: jwilder/nginx-proxy
     container_name: nginx-container
+    env_file: ./nginx/environment.env
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/certs:/etc/letsencrypt
-      - ./nginx/certs-data:/data/letsencrypt
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      # - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/passwords:/etc/nginx/htpasswd
     ports:
       - 80:80
       - 443:443
-    depends_on:
-      - django
     networks:
       - nginx_network
 
   django:
     restart: always
     build: ./site/
+    container_name: django
     env_file: ./site/environment.env
+    environment:
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PORT=8000
+    #ports:
+    #  - 8000:8000
     volumes:
       - ./site/:/opt/services/thiccsite/src
     depends_on: 
      - mysql-site
+     - nginx
     networks:
      - nginx_network
      - mysql_network
@@ -43,7 +51,29 @@ services:
     networks:
      - mysql_network
      - rabbitmq_network
-    command: celery -A thicc.celery_tasks worker --loglevel=info
+    command: celery -E -A thicc.celery_tasks worker --loglevel=info
+
+  flowr:
+    restart: always
+    build: ./site
+    env_file: ./site/environment.env
+    # ports:
+    #   - 5555:5555
+    volumes:
+     - ./site/:/opt/services/thiccsite/src
+     - ./flower/flower_backup:/flower/flower
+    environment:
+      - VIRTUAL_HOST=flower.localhost
+      - VIRTUAL_PORT=5555
+    depends_on: 
+     - nginx
+     - mysql-site
+     - rabbitmq
+    networks:
+     - nginx_network
+     - mysql_network
+     - rabbitmq_network
+    command: celery flower -A thicc.celery_tasks --loglevel=info --persistent=True --db=/flower/flower
 
   rabbitmq:
     restart: always
@@ -62,29 +92,6 @@ services:
     networks:
       - mysql_network
 
-  # mysql-l4dstats:
-  # restart: always
-  # image: mysql:5.7.19
-  # volumes:
-  #   - /opt/services/l4dstatsdb/:/var/lib/mysql
-  # env_file:
-  #   - ./mysql/l4dstats/environment.env
-  # networks:
-  #   - mysql_network
-
-
-  ## teamspeak:
-  ##  image: teamspeak
-  ##  ports:
-  ##    - "9987:9987/udp"
-  ##    - "30033:30033"
-  ##    - "10011:10011"
-  ##  environment:
-  ##    - TS3SERVER_LICENSE=accept
-  ##  volumes:
-  ##    - /data/teamspeak3:/var/ts3server/
-  ##  restart: always
-  
   # l4d2:
   # build: ./game-servers/l4d2
   # depends_on:
@@ -103,22 +110,130 @@ services:
   #   - mysql_network
   # command: /opt/l4d2/srcds_run -game left4dead2 -secure -console -usercon -ip 0.0.0.0 
 
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     environment:
      - PMA_ARBITRARY=1
     restart: always
-    ports:
-     - 8080:80
+    # ports:
+    # - 8081:80
     volumes:
      - /sessions
+    environment:
+      - VIRTUAL_HOST=myadmin.localhost
+      - VIRTUAL_PORT=8080
     depends_on: 
+     - nginx
      - mysql-site
     networks:
      - nginx_network
      - mysql_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - ./prometheus_data:/prometheus
+    # ports:
+    #  - 9090:9090
+    environment:
+      - VIRTUAL_HOST=prom.localhost
+      - VIRTUAL_PORT=9090
+    command:
+      # Use the prometheus.yml located in ./prometheus
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    depends_on:
+      - cadvisor
+      - nginx
+    networks:
+      - nginx_network
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    environment:
+      - VIRTUAL_HOST=node.localhost
+      - VIRTUAL_PORT=9100
+    command: 
+      - '--path.procfs=/host/proc' 
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    # ports:
+    #  - 9100:9100
+    depends_on:
+      - nginx
+    networks:
+      - nginx_network
+    restart: always
+    # deploy:
+    #  mode: global
+
+  alertmanager:
+    image: prom/alertmanager
+    # ports:
+    #  - 9093:9093
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    environment:
+      - VIRTUAL_HOST=alert.localhost
+      - VIRTUAL_PORT=9093
+    depends_on:
+      - nginx
+    networks:
+      - nginx_network
+    restart: always
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+
+  cadvisor:
+    image: google/cadvisor
+    environment:
+      - VIRTUAL_HOST=cadvisor.localhost
+      - VIRTUAL_PORT=8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    # ports:
+    #  - 8080:8080
+    networks:
+      - nginx_network
+    restart: always
+    # deploy:
+    #  mode: global
+
+  grafana:
+    image: grafana/grafana
+    user: "1000"
+    environment:
+      - VIRTUAL_HOST=grafana.localhost
+      - VIRTUAL_PORT=3000
+    depends_on:
+      - prometheus
+    # ports:
+    #  - 3000:3000
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+      #- ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./grafana/config.monitoring
+    depends_on:
+      - nginx
+    networks:
+      - nginx_network
+      - mysql_network
+    restart: always
 
 networks:
   nginx_network:

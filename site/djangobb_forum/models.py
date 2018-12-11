@@ -19,6 +19,8 @@ import pytz
 from djangobb_forum.fields import AutoOneToOneField, ExtendedImageField, JSONField
 from djangobb_forum.util import smiles, convert_text_to_html
 from djangobb_forum import settings as forum_settings
+from django_prometheus.models import ExportModelOperationsMixin
+
 
 
 TZ_CHOICES = [(tz_name, tz_name) for tz_name in pytz.common_timezones]
@@ -50,7 +52,7 @@ else:
     THEME_CHOICES = []
 
 @python_2_unicode_compatible
-class Category(models.Model):
+class Category(ExportModelOperationsMixin('category'), models.Model):
     name = models.CharField(_('Name'), max_length=80)
     groups = models.ManyToManyField(Group, blank=True, verbose_name=_('Groups'), help_text=_('Only users from these groups can see this category'))
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -87,7 +89,7 @@ class Category(models.Model):
 
 
 @python_2_unicode_compatible
-class Forum(models.Model):
+class Forum(ExportModelOperationsMixin('forum'), models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -119,7 +121,7 @@ class Forum(models.Model):
 
 
 @python_2_unicode_compatible
-class Topic(models.Model):
+class Topic(ExportModelOperationsMixin('topic'), models.Model):
     forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
     name = models.CharField(_('Subject'), max_length=255)
     created = models.DateTimeField(_('Created'), auto_now_add=True)
@@ -195,7 +197,7 @@ class Topic(models.Model):
 
 
 @python_2_unicode_compatible
-class Post(models.Model):
+class Post(ExportModelOperationsMixin('post'), models.Model):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), auto_now_add=True)
@@ -262,7 +264,7 @@ class Post(models.Model):
 
 
 @python_2_unicode_compatible
-class Reputation(models.Model):
+class Reputation(ExportModelOperationsMixin('reputation'), models.Model):
     from_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reputations_from', verbose_name=_('From'))
     to_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reputations_to', verbose_name=_('To'))
     post = models.ForeignKey(Post, related_name='post', verbose_name=_('Post'))
@@ -293,7 +295,7 @@ class ProfileManager(models.Manager):
         return qs
 
 
-class Profile(models.Model):
+class Profile(ExportModelOperationsMixin('profile'), models.Model):
     user = AutoOneToOneField(settings.AUTH_USER_MODEL, related_name='forum_profile', verbose_name=_('User'))
     status = models.CharField(_('Status'), max_length=30, blank=True)
     site = models.URLField(_('Site'), blank=True)
@@ -335,7 +337,7 @@ class Profile(models.Model):
 
 
 @python_2_unicode_compatible
-class PostTracking(models.Model):
+class PostTracking(ExportModelOperationsMixin('posttracking'), models.Model):
     """
     Model for tracking read/unread posts.
     In topics stored ids of topics and last_posts as dict.
@@ -354,7 +356,7 @@ class PostTracking(models.Model):
 
 
 @python_2_unicode_compatible
-class Report(models.Model):
+class Report(ExportModelOperationsMixin('report'), models.Model):
     reported_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reported_by', verbose_name=_('Reported by'))
     post = models.ForeignKey(Post, verbose_name=_('Post'))
     zapped = models.BooleanField(_('Zapped'), blank=True, default=False)
@@ -371,7 +373,7 @@ class Report(models.Model):
 
 
 @python_2_unicode_compatible
-class Ban(models.Model):
+class Ban(ExportModelOperationsMixin('forum_ban'), models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_('Banned user'), related_name='ban_users')
     ban_start = models.DateTimeField(_('Ban start'), default=timezone.now)
     ban_end = models.DateTimeField(_('Ban end'), blank=True, null=True)
@@ -396,7 +398,7 @@ class Ban(models.Model):
 
 
 @python_2_unicode_compatible
-class Attachment(models.Model):
+class Attachment(ExportModelOperationsMixin('attachment'), models.Model):
     post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
     content_type = models.CharField(_('Content type'), max_length=255)
@@ -422,7 +424,7 @@ class Attachment(models.Model):
 
 
 @python_2_unicode_compatible
-class Poll(models.Model):
+class Poll(ExportModelOperationsMixin('poll'), models.Model):
     topic = models.ForeignKey(Topic)
     question = models.CharField(max_length=200)
     choice_count = models.PositiveSmallIntegerField(default=1,
@@ -452,7 +454,7 @@ class Poll(models.Model):
 
 
 @python_2_unicode_compatible
-class PollChoice(models.Model):
+class PollChoice(ExportModelOperationsMixin('pollchoice'), models.Model):
     poll = models.ForeignKey(Poll, related_name="choices")
     choice = models.CharField(max_length=200)
     votes = models.IntegerField(default=0, editable=False)

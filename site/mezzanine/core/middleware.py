@@ -1,16 +1,19 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.contrib import admin
 from django.contrib.auth import logout
 from django.contrib.messages import error
 from django.contrib.redirects.models import Redirect
 from django.core.exceptions import MiddlewareNotUsed
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 from django.http import (HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseGone)
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.template import Template, RequestContext
 from django.utils.cache import get_max_age
+from django.utils.lru_cache import lru_cache
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
@@ -20,21 +23,22 @@ from mezzanine.core.management.commands.createdb import (DEFAULT_USERNAME,
                                                          DEFAULT_PASSWORD)
 from mezzanine.utils.cache import (cache_key_prefix, nevercache_token,
                                    cache_get, cache_set, cache_installed)
-from mezzanine.utils.device import templates_for_device
-from mezzanine.utils.sites import current_site_id, templates_for_host
+from mezzanine.utils.conf import middlewares_or_subclasses_installed
+from mezzanine.utils.deprecation import (MiddlewareMixin, is_authenticated)
+from mezzanine.utils.sites import current_site_id
 from mezzanine.utils.urls import next_url
 
 
-class AdminLoginInterfaceSelectorMiddleware(object):
+class AdminLoginInterfaceSelectorMiddleware(MiddlewareMixin):
     """
     Checks for a POST from the admin login view and if authentication is
     successful and the "site" interface is selected, redirect to the site.
     """
     def process_view(self, request, view_func, view_args, view_kwargs):
         login_type = request.POST.get("mezzanine_login_interface")
-        if login_type and not request.user.is_authenticated():
+        if login_type and not is_authenticated(request.user):
             response = view_func(request, *view_args, **view_kwargs)
-            if request.user.is_authenticated():
+            if is_authenticated(request.user):
                 if login_type == "admin":
                     next = next_url(request) or request.get_full_path()
                     username = request.user.get_username()
@@ -53,7 +57,7 @@ class AdminLoginInterfaceSelectorMiddleware(object):
         return None
 
 
-class SitePermissionMiddleware(object):
+class SitePermissionMiddleware(MiddlewareMixin):
     """
     Marks the current user with a ``has_site_permission`` which is
     used in place of ``user.is_staff`` to achieve per-site staff
@@ -79,32 +83,34 @@ class SitePermissionMiddleware(object):
         request.user.has_site_permission = has_site_permission
 
 
-class TemplateForDeviceMiddleware(object):
+class TemplateForDeviceMiddleware(MiddlewareMixin):
     """
+    DEPRECATED: Device detection has been removed from Mezzanine.
     Inserts device-specific templates to the template list.
     """
-    def process_template_response(self, request, response):
-        if hasattr(response, "template_name"):
-            if not isinstance(response.template_name, Template):
-                templates = templates_for_device(request,
-                    response.template_name)
-                response.template_name = templates
-        return response
+    def __init__(self, *args, **kwargs):
+        super(TemplateForDeviceMiddleware, self).__init__(*args, **kwargs)
+        warnings.warn(
+            "`TemplateForDeviceMiddleware` is deprecated. "
+            "Please remove it from your middleware settings.",
+            FutureWarning, stacklevel=2
+        )
 
 
-class TemplateForHostMiddleware(object):
+class TemplateForHostMiddleware(MiddlewareMixin):
     """
     Inserts host-specific templates to the template list.
     """
-    def process_template_response(self, request, response):
-        if hasattr(response, "template_name"):
-            if not isinstance(response.template_name, Template):
-                response.template_name = templates_for_host(
-                    response.template_name)
-        return response
+    def __init__(self, *args, **kwargs):
+        super(TemplateForHostMiddleware, self).__init__(*args, **kwargs)
+        warnings.warn(
+            "`TemplateForHostMiddleware` is deprecated. Please upgrade "
+            "to the template loader. See: https://goo.gl/SzHPR4",
+            FutureWarning, stacklevel=2
+        )
 
 
-class UpdateCacheMiddleware(object):
+class UpdateCacheMiddleware(MiddlewareMixin):
     """
     Response phase for Mezzanine's cache middleware. Handles caching
     the response, and then performing the second phase of rendering,
@@ -129,7 +135,7 @@ class UpdateCacheMiddleware(object):
         # and the response mustn't include an expiry age, indicating it
         # shouldn't be cached.
         marked_for_update = getattr(request, "_update_cache", False)
-        anon = hasattr(request, "user") and not request.user.is_authenticated()
+        anon = hasattr(request, "user") and not is_authenticated(request.user)
         timeout = get_max_age(response)
         if timeout is None:
             timeout = settings.CACHE_MIDDLEWARE_SECONDS
@@ -176,15 +182,20 @@ class UpdateCacheMiddleware(object):
         # Response needs to be run-through the CSRF middleware again so
         # that if there was a {% csrf_token %} inside of the nevercache
         # the cookie will be correctly set for the the response
-        csrf_mw_name = "django.middleware.csrf.CsrfViewMiddleware"
-        if csrf_mw_name in settings.MIDDLEWARE_CLASSES:
+        if csrf_middleware_installed():
             response.csrf_processing_done = False
             csrf_mw = CsrfViewMiddleware()
             csrf_mw.process_response(request, response)
         return response
 
 
-class FetchFromCacheMiddleware(object):
+@lru_cache(maxsize=None)
+def csrf_middleware_installed():
+    csrf_mw_name = "django.middleware.csrf.CsrfViewMiddleware"
+    return middlewares_or_subclasses_installed([csrf_mw_name])
+
+
+class FetchFromCacheMiddleware(MiddlewareMixin):
     """
     Request phase for Mezzanine cache middleware. Return a response
     from cache if found, othwerwise mark the request for updating
@@ -193,14 +204,13 @@ class FetchFromCacheMiddleware(object):
 
     def process_request(self, request):
         if (cache_installed() and request.method == "GET" and
-                not request.user.is_authenticated()):
+                not is_authenticated(request.user)):
             cache_key = cache_key_prefix(request) + request.get_full_path()
             response = cache_get(cache_key)
             # We need to force a csrf token here, as new sessions
             # won't receieve one on their first request, with cache
             # middleware running.
-            csrf_mw_name = "django.middleware.csrf.CsrfViewMiddleware"
-            if csrf_mw_name in settings.MIDDLEWARE_CLASSES:
+            if csrf_middleware_installed():
                 csrf_mw = CsrfViewMiddleware()
                 csrf_mw.process_view(request, lambda x: None, None, None)
                 get_token(request)
@@ -210,7 +220,7 @@ class FetchFromCacheMiddleware(object):
                 return HttpResponse(response)
 
 
-class SSLRedirectMiddleware(object):
+class SSLRedirectMiddleware(MiddlewareMixin):
     """
     Handles redirections required for SSL when ``SSL_ENABLED`` is ``True``.
 
@@ -220,6 +230,13 @@ class SSLRedirectMiddleware(object):
     Also ensure URLs defined by ``SSL_FORCE_URL_PREFIXES`` are redirect
     to HTTPS, and redirect all other URLs to HTTP if on HTTPS.
     """
+    def __init__(self, *args):
+        warnings.warn(
+            "SSLRedirectMiddleware is deprecated. See "
+            "https://docs.djangoproject.com/en/stable/ref/middleware/"
+            "#module-django.middleware.security for alternative solutions.",
+            DeprecationWarning)
+        super(SSLRedirectMiddleware, self).__init__(*args)
 
     def languages(self):
         if not hasattr(self, "_languages"):
@@ -258,13 +275,14 @@ class SSLRedirectMiddleware(object):
         return response
 
 
-class RedirectFallbackMiddleware(object):
+class RedirectFallbackMiddleware(MiddlewareMixin):
     """
     Port of Django's ``RedirectFallbackMiddleware`` that uses
     Mezzanine's approach for determining the current site.
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super(RedirectFallbackMiddleware, self).__init__(*args, **kwargs)
         if "django.contrib.redirects" not in settings.INSTALLED_APPS:
             raise MiddlewareNotUsed
 

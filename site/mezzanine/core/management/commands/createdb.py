@@ -147,6 +147,9 @@ class Command(BaseCommand):
             "i18n.\nWould you like to update translation "
             "fields from the default ones? (yes/no): ")
         if update:
-            create_fields.Command().execute(
-                    verbosity=self.verbosity, interactive=False)
-            update_fields.Command().execute(verbosity=self.verbosity)
+            options = {
+                "verbosity": self.verbosity,
+                "interactive": self.interactive,
+            }
+            call_command(create_fields.Command(), **options)
+            call_command(update_fields.Command(), **options)

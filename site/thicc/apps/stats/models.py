@@ -3,6 +3,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from djangobb_forum.models import Profile
 #from social.apps.django_app.default.models import UserSocialAuth
+from django_prometheus.models import ExportModelOperationsMixin
 
 from social_django.models import UserSocialAuth
 
@@ -12,7 +13,7 @@ steamid64ident = 76561197960265728
 
 
 @python_2_unicode_compatible
-class UserSettings(models.Model):
+class UserSettings(ExportModelOperationsMixin('userstatssettings'), models.Model):
     steam64 = models.CharField(primary_key=True, max_length=255, null=False)
     l4d2_mute = models.BooleanField(default=False)
     gmodzs_mute = models.BooleanField(default=False)
@@ -20,7 +21,7 @@ class UserSettings(models.Model):
     
 
 @python_2_unicode_compatible
-class L4d2MapStats(models.Model):
+class L4d2MapStats(ExportModelOperationsMixin('l4d2mapstats'), models.Model):
     """
     We have a map stat model for each game because each map only
     applies to one game where a user stat object can apply to every
@@ -67,7 +68,7 @@ class L4d2MapStats(models.Model):
 
 
 @python_2_unicode_compatible
-class GmodMapStats(models.Model):
+class GmodMapStats(ExportModelOperationsMixin('gmodmapstat'), models.Model):
     name = models.CharField(max_length=255)
     gamemode = models.IntegerField(default=0)
     custom = models.BooleanField(default=0)
@@ -79,7 +80,7 @@ class GmodMapStats(models.Model):
 
 
 @python_2_unicode_compatible
-class UserStats(models.Model):
+class UserStats(ExportModelOperationsMixin('userstats'), models.Model):
     """
     We must allow users not registered on ThiccGaming.com with their
     steam account linked to have their stats tracked.

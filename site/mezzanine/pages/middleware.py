@@ -8,11 +8,12 @@ from mezzanine.conf import settings
 from mezzanine.pages import context_processors, page_processors
 from mezzanine.pages.models import Page
 from mezzanine.pages.views import page as page_view
-from mezzanine.utils.importing import import_dotted_path
+from mezzanine.utils.conf import middlewares_or_subclasses_installed
+from mezzanine.utils.deprecation import (MiddlewareMixin, is_authenticated)
 from mezzanine.utils.urls import path_to_slug
 
 
-class PageMiddleware(object):
+class PageMiddleware(MiddlewareMixin):
     """
     Adds a page to the template context for the current response.
 
@@ -33,7 +34,8 @@ class PageMiddleware(object):
     context, so that the current page is always available.
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super(PageMiddleware, self).__init__(*args, **kwargs)
         if "mezzanine.pages" not in settings.INSTALLED_APPS:
             raise MiddlewareNotUsed
 
@@ -43,20 +45,13 @@ class PageMiddleware(object):
         Used in ``mezzanine.pages.views.page`` to ensure
         ``PageMiddleware`` or a subclass has been installed. We cache
         the result on the ``PageMiddleware._installed`` to only run
-        this once. Short path is to just check for the dotted path to
-        ``PageMiddleware`` in ``MIDDLEWARE_CLASSES`` - if not found,
-        we need to load each middleware class to match a subclass.
+        this once.
         """
         try:
             return cls._installed
         except AttributeError:
             name = "mezzanine.pages.middleware.PageMiddleware"
-            installed = name in settings.MIDDLEWARE_CLASSES
-            if not installed:
-                for name in settings.MIDDLEWARE_CLASSES:
-                    if issubclass(import_dotted_path(name), cls):
-                        installed = True
-                        break
+            installed = middlewares_or_subclasses_installed([name])
             setattr(cls, "_installed", installed)
             return installed
 
@@ -78,7 +73,7 @@ class PageMiddleware(object):
             return
 
         # Handle ``page.login_required``.
-        if page.login_required and not request.user.is_authenticated():
+        if page.login_required and not is_authenticated(request.user):
             return redirect_to_login(request.get_full_path())
 
         # If the view isn't Mezzanine's page view, try to return the result
@@ -99,6 +94,9 @@ class PageMiddleware(object):
 
         # Run page processors.
         extra_context = {}
+        if request.resolver_match:
+            extra_context = request.resolver_match.kwargs.get("extra_context",
+                                                              {})
         model_processors = page_processors.processors[page.content_model]
         slug_processors = page_processors.processors["slug:%s" % page.slug]
         for (processor, exact_page) in slug_processors + model_processors:

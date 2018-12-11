@@ -28,12 +28,24 @@ from mezzanine.utils.html import TagCloser
 from mezzanine.utils.models import base_concrete_model, get_user_model_name
 from mezzanine.utils.sites import current_site_id, current_request
 from mezzanine.utils.urls import admin_url, slugify, unique_slug
+from django_prometheus.models import ExportModelOperationsMixin
 
 
 user_model_name = get_user_model_name()
 
 
-class SiteRelated(models.Model):
+def wrapped_manager(klass):
+    if settings.USE_MODELTRANSLATION:
+        from modeltranslation.manager import MultilingualManager
+
+        class Mgr(MultilingualManager, klass):
+            pass
+        return Mgr()
+    else:
+        return klass()
+
+
+class SiteRelated(ExportModelOperationsMixin('site_related'), models.Model):
     """
     Abstract model for all things site-related. Adds a foreignkey to
     Django's ``Site`` model, and filters by site with all querysets.
@@ -115,7 +127,7 @@ class Slugged(SiteRelated):
     admin_link.short_description = ""
 
 
-class MetaData(models.Model):
+class MetaData(ExportModelOperationsMixin('meta_data_mezzanine_model'), models.Model):
     """
     Abstract model that provides meta data for content.
     """
@@ -187,7 +199,7 @@ class MetaData(models.Model):
         return description
 
 
-class TimeStamped(models.Model):
+class TimeStamped(ExportModelOperationsMixin('time_stamped_mezzanine_model'), models.Model):
     """
     Provides created and updated timestamps on models.
     """
@@ -284,7 +296,10 @@ class Displayable(Slugged, MetaData, TimeStamped):
         result, since site related data should only be loaded based
         on the current host anyway.
         """
-        return current_request().build_absolute_uri(self.get_absolute_url())
+        req = current_request()
+        abs_url = self.get_absolute_url()
+        build = req.build_absolute_uri(abs_url)
+        return build
 
     def set_short_url(self):
         """
@@ -354,7 +369,7 @@ class Displayable(Slugged, MetaData, TimeStamped):
         return self._get_next_or_previous_by_publish_date(False, **kwargs)
 
 
-class RichText(models.Model):
+class RichText(ExportModelOperationsMixin('mezzanine_richtext_model'), models.Model):
     """
     Provides a Rich Text field for managing general content and making
     it searchable.
@@ -480,7 +495,7 @@ class Orderable(with_metaclass(OrderableBase, models.Model)):
         return self._get_next_or_previous_by_order(False, **kwargs)
 
 
-class Ownable(models.Model):
+class Ownable(ExportModelOperationsMixin('mezzanine_ownable'), models.Model):
     """
     Abstract model that provides ownership of an object for a user.
     """
@@ -498,7 +513,7 @@ class Ownable(models.Model):
         return request.user.is_superuser or request.user.id == self.user_id
 
 
-class ContentTyped(models.Model):
+class ContentTyped(ExportModelOperationsMixin('mezzanine_contenttyped_model'), models.Model):
     """
     Mixin for models that can be subclassed to create custom types.
     In order to use them:
@@ -528,7 +543,7 @@ class ContentTyped(models.Model):
         return getattr(self, self.content_model, None)
 
 
-class SitePermission(models.Model):
+class SitePermission(ExportModelOperationsMixin('mezzanine_contenttyped_model'), models.Model):
     """
     Permission relationship between a user and a site that's
     used instead of ``User.is_staff``, for admin and inline-editing

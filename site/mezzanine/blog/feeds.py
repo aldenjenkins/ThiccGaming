@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed, add_domain
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.utils.feedgenerator import Atom1Feed
 from django.utils.html import strip_tags
@@ -131,6 +131,14 @@ class PostsRSS(Feed):
         if item.featured_image:
             return self.add_domain(item.featured_image.url)
 
+    def item_enclosure_length(self, item):
+        if item.featured_image:
+            return item.featured_image.size
+
+    def item_enclosure_mime_type(self, item):
+        if item.featured_image:
+            return item.featured_image.mimetype[0]
+
 
 class PostsAtom(PostsRSS):
     """
@@ -141,3 +149,6 @@ class PostsAtom(PostsRSS):
 
     def subtitle(self):
         return self.description()
+
+    def item_updateddate(self, item):
+        return item.updated

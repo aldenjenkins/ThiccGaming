@@ -6,34 +6,24 @@
 {% block title %}{% endblock %}
 
 {% block main_content %}
-
-    <div id="email-required-modal" class="content-container">
-        <form action="{% url "social:complete" backend=partial_backend_name %}" method="post" role="form">
-          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-          <input type="hidden" name="partial_token" value="{{ partial_token }}">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h4 class="modal-title">{% blocktrans %}Email required</h4>
-              </div>
-
-              <div class="modal-body">
-                <p>An email address is required.</p>
-                <div class="form-group">
-                  <label class="control-label" for="email">Email address:</label>
-                  <input class="form-control" id="email" type="email" name="email" value="" autofocus />
-                </div>
-              </div>
-
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Continue</button>
-              </div>
+  <div id="email-required-modal" class="content-container">
+      <form action="{% url "social:complete" backend=partial_backend_name %}" method="post" role="form">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input type="hidden" name="partial_token" value="{{ partial_token }}">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{% blocktrans %}Email required</h4>
+          </div>
+          <div class="modal-body">
+            <p>An email address is required.</p>
+            <div class="form-group">
+              <label class="control-label" for="email">Email address:</label>
+              <input class="form-control" id="email" type="email" name="email" value=""  />
             </div>
           </div>
-        </form>
-      </div>
-
-    {% endblocktrans %}
-
-
+        </div>
+          <button type="submit" class="btn ">Continue</button>
+      </form>
+    </div>
+  {% endblocktrans %}
 {% endblock %}

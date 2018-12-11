@@ -25,8 +25,8 @@ from mezzanine.twitter import get_auth_settings
 from mezzanine.twitter.managers import TweetManager
 
 
-re_usernames = re.compile("(^|\W)@([0-9a-zA-Z+_]+)", re.IGNORECASE)
-re_hashtags = re.compile("#([0-9a-zA-Z+_]+)", re.IGNORECASE)
+re_usernames = re.compile(r"(^|\W)@([0-9a-zA-Z+_]+)", re.IGNORECASE)
+re_hashtags = re.compile(r"#([0-9a-zA-Z+_]+)", re.IGNORECASE)
 replace_hashtags = "<a href=\"http://twitter.com/search?q=%23\\1\">#\\1</a>"
 replace_usernames = "\\1<a href=\"http://twitter.com/\\2\">@\\2</a>"
 
@@ -150,7 +150,8 @@ class Tweet(models.Model):
         _("User name (Retweeted by)"), max_length=100, null=True)
     retweeter_full_name = models.CharField(
         _("Full name (Retweeted by)"), max_length=100, null=True)
-    query = models.ForeignKey("Query", related_name="tweets")
+    query = models.ForeignKey("Query", on_delete=models.CASCADE,
+        related_name="tweets")
 
     objects = TweetManager()
 

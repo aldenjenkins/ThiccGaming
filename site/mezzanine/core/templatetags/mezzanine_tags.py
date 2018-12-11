@@ -100,29 +100,14 @@ def initialize_nevercache():
 
 initialize_nevercache()
 
-from django.template import RequestContext
-def my_flatten(dictt):
-    for key in dictt.dicts:
-        if isinstance(key, RequestContext):
-            my_flatten(key)
-            dictt.dicts[dictt.dicts.index(key)] = key.flatten()
-    return dictt
 
 @register.simple_tag(takes_context=True)
 def fields_for(context, form, template="includes/form_fields.html"):
     """
     Renders fields for a form with an optional template choice.
     """
-    import json
     context["form_for_fields"] = form
-    # del context.dicts[1].dicts[2::]
-
-    context = my_flatten(context)
-
-    derp = get_template(template)
-    context = context.flatten()
-    hello = derp.render(context)
-    return hello
+    return get_template(template).render(context.flatten())
 
 
 @register.inclusion_tag("includes/form_errors.html")
@@ -166,9 +151,11 @@ def ifinstalled(parser, token):
     """
     Old-style ``if`` tag that renders contents if the given app is
     installed. The main use case is:
+
     {% ifinstalled app_name %}
     {% include "app_name/template.html" %}
     {% endifinstalled %}
+
     so we need to manually pull out all tokens if the app isn't
     installed, since if we used a normal ``if`` tag with a False arg,
     the include tag will still try and find the template to include.
@@ -539,7 +526,6 @@ def editable(parsed, context, token):
             context["editable_form"] = get_edit_form(obj, field_names)
             context["original"] = parsed
             t = get_template("includes/editable_form.html")
-            context = my_flatten(context)
             return t.render(context.flatten())
     return parsed
 
@@ -729,6 +715,7 @@ def dashboard_column(context, token):
 def translate_url(context, language):
     """
     Translates the current URL for the given language code, eg:
+
         {% translate_url "de" %}
     """
     try:

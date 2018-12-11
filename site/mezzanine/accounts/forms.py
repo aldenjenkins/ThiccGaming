@@ -15,13 +15,6 @@ from mezzanine.core.forms import Html5Mixin
 from mezzanine.utils.urls import slugify, unique_slug
 
 
-def linear_search(item):
-    fp = open('spamdomains.txt')
-    for line in fp:
-        if item == line.strip("\n"):
-            return True
-    return False
-
 User = get_user_model()
 
 _exclude_fields = tuple(getattr(settings,
@@ -134,35 +127,6 @@ class ProfileForm(Html5Mixin, forms.ModelForm):
         except ProfileNotConfigured:
             pass
 
-    # def binary_search(item):
-    #    fp = open('spamdomains.txt')
-    #    fp.seek(0, 2)
-    #    begin = 0
-    #    end = fp.tell()
-    #    while (begin < end):
-    #        fp.seek((end - begin) / 2, 0)
-    #        fp.readline()
-    #        line_key = get_key(fp.readline())
-    #        if (item == line_key):
-    #            found = True
-    #            break
-    #        elif (item > line_key):
-    #            begin = fp.tell()
-    #        else:
-    #            end = fp.tell()
-    #    fp.close()
-    #    return found
-
-    def linear_search_domain(self, item):
-        fp = open('spamdomains.txt')
-        for line in fp:
-            if item == line.strip("\n"):
-                return True
-        return False
-
-
-
-
     def clean_username(self):
         """
         Ensure the username doesn't exist or contain invalid chars.
@@ -174,9 +138,6 @@ class ProfileForm(Html5Mixin, forms.ModelForm):
             raise forms.ValidationError(
                 ugettext("Username can only contain letters, numbers, dashes "
                          "or underscores."))
-        if len(username) > 12:
-            raise forms.ValidationError(
-                ugettext("Username must be less than 13 characters in length."))
         lookup = {"username__iexact": username}
         try:
             User.objects.exclude(id=self.instance.id).get(**lookup)
@@ -201,8 +162,6 @@ class ProfileForm(Html5Mixin, forms.ModelForm):
                 errors.append(
                         ugettext("Password must be at least %s characters") %
                         settings.ACCOUNTS_MIN_PASSWORD_LENGTH)
-            if len(password1) > 19:
-                errors.append(ugettext("Password cannot be over 19 characters"))
             if errors:
                 self._errors["password1"] = self.error_class(errors)
         return password2
@@ -212,24 +171,11 @@ class ProfileForm(Html5Mixin, forms.ModelForm):
         Ensure the email address is not already registered.
         """
         email = self.cleaned_data.get("email")
-        try:
-            firstPart, secondPart = email.split('@')
-        except Exception:
-            raise forms.ValidationError(
-                ugettext("This email is invalid"))
-
-        if self.linear_search_domain(secondPart):
-            raise forms.ValidationError(
-                ugettext("This email is invalid"))
-
         qs = User.objects.exclude(id=self.instance.id).filter(email=email)
-
         if len(qs) == 0:
             return email
         raise forms.ValidationError(
                                 ugettext("This email is already registered"))
-
-
 
     def save(self, *args, **kwargs):
         """

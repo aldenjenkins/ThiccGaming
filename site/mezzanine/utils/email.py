@@ -2,11 +2,10 @@ from __future__ import unicode_literals
 from future.builtins import bytes, str
 
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import EmailMultiAlternatives, send_mail
-from django.core.urlresolvers import reverse
-from django.template import loader, Context
+from django.core.mail import EmailMultiAlternatives
+from django.urls import reverse
+from django.template import loader
 from django.utils.http import int_to_base36
-from thicc import settings as mail_settings
 
 from mezzanine.conf import settings
 from mezzanine.utils.urls import admin_url, next_url
@@ -26,7 +25,7 @@ def subject_template(template, context):
     Loads and renders an email subject template, returning the
     subject string.
     """
-    subject = loader.get_template(template).render(Context(context))
+    subject = loader.get_template(template).render(context)
     return " ".join(subject.splitlines()).strip()
 
 
@@ -56,7 +55,7 @@ def send_mail_template(subject, template, addr_from, addr_to, context=None,
         addr_bcc = [addr_bcc]
     # Loads a template passing in vars as context.
     render = lambda type: loader.get_template("%s.%s" %
-                          (template, type)).render(Context(context))
+                          (template, type)).render(context)
     # Create and send email.
     msg = EmailMultiAlternatives(subject, render("txt"),
                                  addr_from, addr_to, addr_bcc,
@@ -123,21 +122,3 @@ def send_approved_mail(request, user):
     send_mail_template(subject, "email/account_approved",
                        settings.DEFAULT_FROM_EMAIL, user.email,
                        context=context)
-
-def send_owner_mail(request, subject, message):
-    """
-    Sends an email to a user once their ``is_active`` status goes from
-    ``False`` to ``True`` when the ``ACCOUNTS_APPROVAL_REQUIRED``
-    setting is ``True``.
-    """
-    # context = {"request": request, "subject": subject, "message":message}
-
-
-    # subject = subject_template("email/account_approved_subject.txt", context)
-    # send_mail_template(subject, "email/account_approved",
-    #                    settings.DEFAULT_FROM_EMAIL, user.email,
-    #                    context=context)
-    # send_mail()
-    send_mail(subject, message,
-              settings.DEFAULT_FROM_EMAIL, [mail_settings.OWNER_EMAIL],
-              False, mail_settings.EMAIL_HOST_USER, mail_settings.EMAIL_HOST_USER, connection=request)

@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.signals import post_save, post_delete
+from .signals import post_expire
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils import timezone
@@ -23,13 +24,16 @@ from datetime import timedelta
 class PremiumDonation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     end_time = models.DateTimeField()
+    expired = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return "%s expires at %s" % (self.user, self.end_time)
 
 
-@receiver(post_delete, sender=PremiumDonation)
-def premium_post_delete(sender, instance, **kwargs):
+@receiver(post_expire)
+def premium_post_expire(sender, instance, **kwargs):
     group = Group.objects.get(name=settings.PREMIUM_GROUP_NAME)
     instance.user.groups.remove(group)
     profile = Profile.objects.get(user=instance.user)
@@ -46,7 +50,6 @@ def premium_post_delete(sender, instance, **kwargs):
     profile.save()
 
 
-
 @receiver(post_save, sender=PremiumDonation)
 def premium_post_save(sender, instance, created, **kwargs):
     if created:
@@ -58,7 +61,13 @@ def premium_post_save(sender, instance, created, **kwargs):
         if(profile.status == "Member" or profile.status == ""):
             profile.status = "Premium"
             admin_premium_group = Ban_Group.objects.get(textual_name="Premium")
-            donator_admin = Ban_Admin(aid=instance.user, user=instance.user, authid=UserSocialAuth.objects.get(user_id=instance.user_id).uid, srv_group=admin_premium_group, srv_flags=admin_premium_group.flags, immunity=admin_premium_group.immunity)
+            donator_admin = Ban_Admin(
+                aid=instance.user, 
+                user=instance.user,
+                authid=UserSocialAuth.objects.get(user_id=instance.user_id).uid,
+                srv_group=admin_premium_group,
+                srv_flags=admin_premium_group.flags,
+                immunity=admin_premium_group.immunity)
             donator_admin.save()
             # reload_admins()
         profile.save()

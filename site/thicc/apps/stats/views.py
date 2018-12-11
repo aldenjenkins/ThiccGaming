@@ -123,7 +123,7 @@ class StatsListView(ListView):
 #              if count == 0:
 #                  messages.error(request, _("This user does not exist."))
 #                  return render(request, 'bans/ban_search.html')
-#              messages.warning(request, _("This user's STEAM account is not linked to a FooBar Gaming Account."))
+#              messages.warning(request, _("This user's STEAM account is not linked to a Thicc Gaming Account."))
 #  
 #          if count == 0:
 #              messages.warning(request, _("This user has no previous bans."))
@@ -169,7 +169,7 @@ class StatsListView(ListView):
 #          socialAuthUserID = UserSocialAuth.objects.get(uid=ban.authid).user_id
 #          ban.user = Profile.objects.get(user_id=socialAuthUserID)
 #      except UserSocialAuth.DoesNotExist:
-#          ban.nouser = "STEAM account not linked to a FooBar Gaming account."
+#          ban.nouser = "STEAM account not linked to a Thicc Gaming account."
 #  
 #      # Format the ban's length
 #      c = ban.length

@@ -1,6 +1,6 @@
-{% load i18n accounts_tags %}
+{% load i18n %}
 {% block main %}
-{% blocktrans %} Thanks for creating your ThiccGaming.com account.{% endblocktrans %}
+{% trans "Hey there, thanks for creating your account." %}
 {% trans "Please use the link below to activate it." %}
-https://{{ request.get_host }}{{ verify_url }}
+http://{{ request.get_host }}{{ verify_url }}
 {% endblock %}

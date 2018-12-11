@@ -4,7 +4,7 @@ from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import info, error
-from django.core.urlresolvers import NoReverseMatch, get_script_prefix
+from django.urls import NoReverseMatch, get_script_prefix
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from mezzanine.accounts import get_profile_form
 from mezzanine.accounts.forms import LoginForm, PasswordResetForm
 from mezzanine.conf import settings
-from mezzanine.utils.email import send_verification_mail, send_approve_mail, send_owner_mail
+from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from mezzanine.utils.urls import login_redirect, next_url
 
 
@@ -30,7 +30,7 @@ def login(request, template="accounts/account_login.html",
         info(request, _("Successfully logged in"))
         auth_login(request, authenticated_user)
         return login_redirect(request)
-    context = {"form": form, "title": _("Log in"), "next": request.GET.get('next', None)}
+    context = {"form": form, "title": _("Log in")}
     context.update(extra_context or {})
     return TemplateResponse(request, template, context)
 
@@ -42,7 +42,6 @@ def logout(request):
     auth_logout(request)
     info(request, _("Successfully logged out"))
     return redirect(next_url(request) or get_script_prefix())
-    # return redirect("/forum")
 
 
 def signup(request, template="accounts/account_signup.html",
@@ -55,7 +54,6 @@ def signup(request, template="accounts/account_signup.html",
     if request.method == "POST" and form.is_valid():
         new_user = form.save()
         if not new_user.is_active:
-            send_owner_mail( "{} has signed up!".format(new_user.username), "A new user, {}, has signed up with the email {}".format(new_user.username, new_user.email))
             if settings.ACCOUNTS_APPROVAL_REQUIRED:
                 send_approve_mail(request, new_user)
                 info(request, _("Thanks for signing up! You'll receive "
@@ -64,11 +62,11 @@ def signup(request, template="accounts/account_signup.html",
                 send_verification_mail(request, new_user, "signup_verify")
                 info(request, _("A verification email has been sent with "
                                 "a link for activating your account."))
-            return redirect(next_url(request) or "/forum")
+            return redirect(next_url(request) or "/")
         else:
             info(request, _("Successfully signed up"))
             auth_login(request, new_user)
-            return redirect("/forum")
+            return login_redirect(request)
     context = {"form": form, "title": _("Sign up")}
     context.update(extra_context or {})
     return TemplateResponse(request, template, context)
@@ -90,7 +88,7 @@ def signup_verify(request, uidb36=None, token=None):
         return login_redirect(request)
     else:
         error(request, _("The link you clicked is no longer valid."))
-        return redirect("/forum")
+        return redirect("/")
 
 
 @login_required
@@ -119,7 +117,7 @@ def account_redirect(request):
     Just gives the URL prefix for accounts an action - redirect
     to the profile update form.
     """
-    return redirect("/forum")
+    return redirect("profile_update")
 
 
 @login_required
@@ -151,7 +149,6 @@ def password_reset(request, template="accounts/account_password_reset.html",
         send_verification_mail(request, user, "password_reset_verify")
         info(request, _("A verification email has been sent with "
                         "a link for resetting your password."))
-        return redirect("/forum")
     context = {"form": form, "title": _("Password Reset")}
     context.update(extra_context or {})
     return TemplateResponse(request, template, context)
@@ -164,43 +161,4 @@ def password_reset_verify(request, uidb36=None, token=None):
         return redirect("profile_update")
     else:
         error(request, _("The link you clicked is no longer valid."))
-        return redirect("/forum")
-
-from django.http import Http404
-from django.template import RequestContext
-def unsubscribe(request, uuid, token, template='unsubscribe.html',
-                extra_context=None):
-
-    user = get_object_or_404(User, uuid=uuid)
-    if user.email_unsubscribed:
-        return render_to_response(template, context={'unsubbed_user': user})
-
-    the_token = get_token_for_user(user)
-    if not token == the_token:
-        raise Http404
-
-
-    user.email_verified=True
-    user.email_unsubscribed = True
-    user.save()
-
-    return render_to_response(template, context={'unsubbed_user': user})
-
-
-from thicc.core.custom_social_pipelines import get_token_for_user
-from django.shortcuts import render_to_response
-def verify_email(request, uuid, token, template='verify_email.html',
-                extra_context=None):
-
-    user = get_object_or_404(User, uuid=uuid)
-    if user.email_verified:
-        return render_to_response('already_verified_email.html', context={'verified_user': user})
-
-    the_token = get_token_for_user(user)
-    if not token == the_token:
-        raise Http404
-
-    user.email_verified=True
-    user.save()
-
-    return render_to_response(template, context={'verified_user': user})
+        return redirect("/")

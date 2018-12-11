@@ -6,7 +6,9 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User as AuthUser
-from django.core.urlresolvers import NoReverseMatch
+from django.contrib.redirects.admin import RedirectAdmin
+from django.contrib.messages import error
+from django.urls import NoReverseMatch
 from django.forms import ValidationError, ModelForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -17,6 +19,7 @@ from mezzanine.core.forms import DynamicInlineAdminForm
 from mezzanine.core.models import (
     Orderable, ContentTyped, SitePermission, CONTENT_STATUS_PUBLISHED)
 from mezzanine.utils.models import base_concrete_model
+from mezzanine.utils.sites import current_site_id
 from mezzanine.utils.static import static_lazy as static
 from mezzanine.utils.urls import admin_url
 
@@ -143,6 +146,10 @@ class BaseDynamicInlineAdmin(object):
     extra = 1
 
     def get_fields(self, request, obj=None):
+        """
+        For subclasses of ``Orderable``, the ``_order`` field must
+        always be present and be the last field.
+        """
         fields = super(BaseDynamicInlineAdmin, self).get_fields(request, obj)
         if issubclass(self.model, Orderable):
             fields = list(fields)
@@ -154,6 +161,9 @@ class BaseDynamicInlineAdmin(object):
         return fields
 
     def get_fieldsets(self, request, obj=None):
+        """
+        Same as above, but for fieldsets.
+        """
         fieldsets = super(BaseDynamicInlineAdmin, self).get_fieldsets(
                                                             request, obj)
         if issubclass(self.model, Orderable):
@@ -287,7 +297,8 @@ class ContentTypedAdmin(object):
             except (AttributeError, TypeError):
                 pass
 
-            fields = self.model._meta.fields + self.model._meta.many_to_many
+            fields = (self.model._meta.get_fields() +
+                      self.model._meta.many_to_many)
             for field in reversed(fields):
                 if field.name not in exclude_fields and field.editable:
                     if not hasattr(field, "translated_field"):
@@ -321,11 +332,10 @@ class ContentTypedAdmin(object):
 
         self.check_permission(request, content_model, "change")
 
-        if self.model is self.concrete_model:
-            if content_model is not None:
-                change_url = admin_url(content_model.__class__, "change",
-                                       content_model.id)
-                return HttpResponseRedirect(change_url)
+        if content_model.__class__ != self.model:
+            change_url = admin_url(content_model.__class__, "change",
+                                   content_model.id)
+            return HttpResponseRedirect(change_url)
 
         return super(ContentTypedAdmin, self).change_view(
             request, object_id, **kwargs)
@@ -359,9 +369,9 @@ class ContentTypedAdmin(object):
         return models
 
 
-###########################################
-# Site Permissions Inlines for User Admin #
-###########################################
+####################################
+# User Admin with Site Permissions #
+####################################
 
 class SitePermissionInline(admin.TabularInline):
     model = SitePermission
@@ -369,11 +379,87 @@ class SitePermissionInline(admin.TabularInline):
     can_delete = False
 
 
+class SitePermissionUserAdminForm(UserAdmin.form):
+
+    def clean_email(form):
+        email = form.cleaned_data.get("email")
+        try:
+            User.objects.exclude(id=form.instance.id).get(email=email)
+        except User.DoesNotExist:
+            return email
+        raise ValidationError(_("This email is already registered"))
+
+
 class SitePermissionUserAdmin(UserAdmin):
+
     inlines = [SitePermissionInline]
+    form = SitePermissionUserAdminForm
+
+    def save_model(self, request, obj, form, change):
+        """
+        Provides a warning if the user is an active admin with no admin access.
+        """
+        super(SitePermissionUserAdmin, self).save_model(
+            request, obj, form, change)
+        user = self.model.objects.get(id=obj.id)
+        has_perms = len(user.get_all_permissions()) > 0
+        has_sites = SitePermission.objects.filter(user=user).count() > 0
+        if user.is_active and user.is_staff and not user.is_superuser and not (
+                has_perms and has_sites):
+            error(request, "The user is active but won't be able to access "
+                           "the admin, due to no edit/site permissions being "
+                           "selected")
+
 
 # only register if User hasn't been overridden
 if User == AuthUser:
     if User in admin.site._registry:
         admin.site.unregister(User)
     admin.site.register(User, SitePermissionUserAdmin)
+
+
+class SiteRedirectAdminForm(RedirectAdmin.form):
+
+    def clean_old_path(form):
+        path = form.cleaned_data.get("old_path")
+        try:
+            Redirect.objects.exclude(id=form.instance.id).get(old_path=path)
+        except Redirect.DoesNotExist:
+            return path
+        raise ValidationError(_("A redirect from this path already exists"))
+
+
+class SiteRedirectAdmin(RedirectAdmin):
+    """
+    Subclass of Django's redirect admin that modifies it to behave the
+    way most other admin classes do it Mezzanine with regard to site
+    filtering. It filters the list view by current site, hides the site
+    field from the change form, and assigns the current site to the
+    redirect when first created.
+    """
+
+    fields = ("old_path", "new_path")  # Excludes the site field.
+    form = SiteRedirectAdminForm
+
+    def get_queryset(self, request):
+        """
+        Filters the list view by current site.
+        """
+        queryset = super(SiteRedirectAdmin, self).get_queryset(request)
+        return queryset.filter(site_id=current_site_id())
+
+    def save_form(self, request, form, change):
+        """
+        Assigns the current site to the redirect when first created.
+        """
+        obj = form.save(commit=False)
+        if not obj.site_id:
+            obj.site_id = current_site_id()
+        return super(SiteRedirectAdmin, self).save_form(request, form, change)
+
+
+if "django.contrib.redirects" in settings.INSTALLED_APPS:
+    from django.contrib.redirects.models import Redirect
+    if Redirect in admin.site._registry:
+        admin.site.unregister(Redirect)
+    admin.site.register(Redirect, SiteRedirectAdmin)

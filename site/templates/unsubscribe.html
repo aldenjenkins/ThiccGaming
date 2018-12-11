@@ -1,0 +1,131 @@
+{% extends "base-actual.html" %}
+{#{% extends 'djangobb_forum/base.html' %}#}
+{% load i18n static stat_tags %}
+
+{% block meta_title %}{% trans "SUCCessfully unsubscribed!" %}{% endblock %}
+{% block title %}{% endblock %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>You have SUCCessfully unsubscribed!</title>
+</head>
+<body>
+You have SUCCessfully unsubscribed user {{ unsubbed_user.username }}. If you would like to update your email preferences, please do so in the app.
+</body>
+</html>
+
+{% block breadcrumb_menu %}
+    <div class="content-container no-padding">
+        <div class="breadcrumbs count-3">
+            <a href="{% url 'home' %}"><i class="fa fa-fw fa-home"></i></a>
+            <a href="{% url 'stats:index' %}">{% trans 'Stats' %}</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block main_content %}
+
+{#    {% block messages %}#}
+{#        {% if messages %}#}
+{#        <div id="messages">#}
+{#            {% for message in messages %}#}
+{#                <div class="message{% if message.tags %} {{ message.tags }}{% endif %}" role="alert">{{ message }}</div>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#        {% endif %}#}
+{#    {% endblock messages %}#}
+
+{#    <div>#}
+{#    <span style="font-size:2.5em;">Bans</span>#}
+{#    <span style="font-size:1.75em;float:right;">Page {{ bans.number }}</span>#}
+{#    </div>#}
+
+{#<span style="float:right">Page {{ bans.number }}</span>#}
+{# {% if user.is_authenticated and user.is_staff or user.is_superuser %} #}
+{#  #}
+{#     <div style="margin:0px auto;"><a style="text-align:center" class="btn waves-light" href="{% url 'stats:add-stats' %}">Add UserStats</a></div> #}
+{# {% endif %} #}
+    <div class="content-container">
+            <div style="background-color:lightgrey;">
+                {% if stats_list %}
+                    <h3 style="float: left;">Stats</h3>
+                    <h5 style="float: right;">Page {{ page_obj.count }}</h5>
+                {% else %}
+                    <h3 style="float: left;">No Stats yet. Be the first one to join the game!</h3>
+                {% endif %}
+            </div>
+
+            <h5 style="text-align: center;">Total users: {{ stats_list.count }}</h5>
+
+            {% include 'stats/userstats_table.html' %}
+
+    </div>
+
+
+    {% if page_obj.has_previous or page_obj.has_next %}
+        <ul class="pagination {{ text_align|default:'center-align' }}">
+            <li {% if not page_obj.has_previous %} class="disabled"{% endif %}>
+                <a href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}{% else %}#{% endif %}">
+                    <i class="fa fa-fw fa-chevron-left"></i>
+                </a>
+            </li>
+
+            <li{% if page_obj.number == 1%} class="active"{% endif %}>
+                <a href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">1</a>
+            </li>
+            <li{% if page_obj.number == 2 %} class="active"{% endif %}>
+                <a href="?page=2{% if querystring %}&{{ querystring }}{% endif %}">2</a>
+            </li>
+            <li{% if page_obj.number == 3 %} class="active"{% endif %}>
+                <a href="?page=3{% if querystring %}&{{ querystring }}{% endif %}">3</a>
+            </li>
+            <li>
+                <p>...</p>
+            </li>
+
+            </li>
+
+
+            <li {% if not page_obj.has_next %} class="disabled"{% endif %}>
+                <a href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}{% else %}#{% endif %}">
+                    <i class="fa fa-fw fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+{##}
+{#<script>#}
+{#$(document).ready(function(){#}
+{##}
+{#$("html").hide();#}
+{##}
+{# });#}
+{##}
+{#​</script>#}
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        $(document).ready(function(){
+            $(".ban-row").click(function(){
+                $(this).next().toggle('fast');
+
+            });
+            $(".controlpanel").click(function(){
+                $(this).next(".openme").toggle('fast');
+            });
+
+        });
+    </script>
+{#    {% if user.is_authenticated and user.is_superuser %}#}
+{#    <script>#}
+{#        $(document).ready(function(){#}
+{#            $("#unban").click(function(){#}
+{#                $(this).next().toggle('fast');#}
+{#            });#}
+{#        });#}
+{#    </script>#}
+{#{% endif %}#}
+{% endblock %}

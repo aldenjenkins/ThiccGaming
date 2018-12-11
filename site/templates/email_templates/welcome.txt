@@ -1,0 +1,15 @@
+Welcome to metoo {{ username }}! This email contains very sensitive informa... just kidding. It got you to open it though, didn't it?
+
+We just wanted to say thanks for joining our community of people who want a fun way to spend their time, make friends and enjoy each other's company. We're excited you're here!
+
+Don't worry, we hate spam just as much as you do. The only email you'll get from us is updates from forum topics you've posted on, and maybe what we've been working on behind the scenes.
+
+That's pretty much all we've got for now. Now go post some cool topics or memes or something.
+
+- Your friends at Thicc Gaming
+
+Open metoo https://thicc.io/verifyemail/{{ user_id }}/{{ token }}/
+
+Questions or feedback? Contact us at support@thicc.io
+
+Don't like these emails? Unsubscribe. https://thicc.io/unsubscribe/{{ user_id }}/{{ token }}/

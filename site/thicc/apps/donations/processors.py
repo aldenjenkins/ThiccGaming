@@ -14,8 +14,8 @@ def donations(request):
         amount = Decimal("0.0")
     amount_max = Decimal(settings.MONTHLY_DONATION_AMOUNT)
     amount_needed = amount_max-amount if amount_max-amount > 0 else 0
-    context = {'donation_amount' : "%g" % (amount),
-               'donation_max' : "%g" % (amount_max),
-               'donation_needed' : "%g" % (amount_needed),
-               'donation_percent' : "%g" % ((amount/amount_max)*100)}
+    context = {'donation_amount': "%g" % (amount),
+               'donation_max': "%g" % (amount_max),
+               'donation_needed': "%g" % (amount_needed),
+               'donation_percent': "%g" % ((amount/amount_max)*100)}
     return context

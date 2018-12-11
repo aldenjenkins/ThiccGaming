@@ -1,10 +1,17 @@
 from __future__ import unicode_literals
 from future.builtins import str
 
+from datetime import datetime
 from uuid import uuid4
 
 from django import forms
-from django.forms.extras.widgets import SelectDateWidget
+try:
+    from django.forms.widgets import SelectDateWidget
+except ImportError:
+    # Django 1.8
+    from django.forms.extras.widgets import SelectDateWidget
+
+from django.forms.utils import to_current_timezone
 from django.utils.safestring import mark_safe
 
 from mezzanine.conf import settings
@@ -44,9 +51,10 @@ class TinyMceWidget(forms.Textarea):
     """
 
     class Media:
-        js = (static("mezzanine/tinymce/tinymce.min.js"),
-              static(settings.TINYMCE_SETUP_JS))
-        css = {'all': (static("mezzanine/tinymce/tinymce.css"),)}
+        js = [static("mezzanine/tinymce/tinymce.min.js"),
+              static("mezzanine/tinymce/jquery.tinymce.min.js"),
+              static(settings.TINYMCE_SETUP_JS)]
+        css = {'all': [static("mezzanine/tinymce/tinymce.css")]}
 
     def __init__(self, *args, **kwargs):
         super(TinyMceWidget, self).__init__(*args, **kwargs)
@@ -91,11 +99,25 @@ class SplitSelectDateTimeWidget(forms.SplitDateTimeWidget):
         time_widget = forms.TimeInput(attrs=attrs, format=time_format)
         forms.MultiWidget.__init__(self, (date_widget, time_widget), attrs)
 
+    def decompress(self, value):
+        if isinstance(value, str):
+            return value.split(" ", 1)
+        elif isinstance(value, datetime):
+            value = to_current_timezone(value)
+            return [value.date(), value.time().replace(microsecond=0)]
+        return [None, None]
+
+    def value_from_datadict(self, data, files, name):
+        return " ".join([x or "" for x in super(SplitSelectDateTimeWidget,
+            self).value_from_datadict(data, files, name)])
+
 
 class CheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     """
     Wraps render with a CSS class for styling.
     """
+    dont_use_model_field_default_for_empty_data = True
+
     def render(self, *args, **kwargs):
         rendered = super(CheckboxSelectMultiple, self).render(*args, **kwargs)
         return mark_safe("<span class='multicheckbox'>%s</span>" % rendered)

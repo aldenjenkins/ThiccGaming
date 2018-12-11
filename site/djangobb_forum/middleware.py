@@ -9,12 +9,21 @@ from djangobb_forum import settings as forum_settings
 
 
 class LastLoginMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
     def process_request(self, request):
         if request.user.is_authenticated():
             cache.set('djangobb_user%d' % request.user.id, True, forum_settings.USER_ONLINE_TIMEOUT)
 
 
 class ForumMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+    def __call__(self, request):
+        return self.get_response(request)
     def process_request(self, request):
         if request.user.is_authenticated():
             profile = request.user.forum_profile
@@ -31,6 +40,10 @@ class ForumMiddleware(object):
 
 
 class UsersOnline(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+    def __call__(self, request):
+        return self.get_response(request)
     def process_request(self, request):
         now = timezone.now()
         delta = now - timedelta(seconds=forum_settings.USER_ONLINE_TIMEOUT)
@@ -56,6 +69,10 @@ class UsersOnline(object):
 
 
 class TimezoneMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+    def __call__(self, request):
+        return self.get_response(request)
     def process_request(self, request):
         if request.user.is_authenticated():
             profile = request.user.forum_profile

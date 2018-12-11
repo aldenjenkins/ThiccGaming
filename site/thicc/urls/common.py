@@ -7,7 +7,6 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.views.i18n import set_language
 
-
 from mezzanine.core.views import direct_to_template
 from mezzanine.blog.views import blog_post_list
 from mezzanine.conf import settings
@@ -17,6 +16,11 @@ from thicc.apps.django_azelphurmotd.views import radio, staff
 from django.conf.urls.static import static
 
 from thicc.core import custom_social_pipelines as custom_social_views
+from thicc.core.custom_views import unsubscribe, verify_email
+from django_prometheus import exports
+
+from django.contrib.auth.decorators import user_passes_test
+
 
 admin.autodiscover()
 
@@ -27,7 +31,11 @@ admin.autodiscover()
 urlpatterns = i18n_patterns(
     # Change the admin prefix here to use an alternate URL for the
     # admin interface, which would be marginally more secure.
-    url("^adminpageforyouandme/", include(admin.site.urls)),
+    url(r'^{}/'.format(settings.ADMIN_URL_SLUG), include(admin.site.urls)),
+    #url(r'^prometheus/', include('django_prometheus.urls', namespace='prometheus')),
+    #url(r'^metrics$', user_passes_test(lambda u: u.is_staff)(exports.ExportToDjangoView), name='prometheus-django-metrics'),
+    url(r'^metrics$', exports.ExportToDjangoView, name='prometheus-django-metrics'),
+    url(r'^silk/', include('silk.urls', namespace='silk')),
     url(r'^game_info/', include('game_info.urls')),
     url(r'^donate/', include('thicc.apps.donations.urls')),
     # url(r'^forum/user/(?P<username>.*)/social/$', login_required(TemplateView.as_view(template_name='profile_social.html'))),
@@ -54,16 +62,23 @@ urlpatterns = i18n_patterns(
     # url(r'^chat/', TemplateView.as_view(template_name='ingame/tf2/howtosurf.html')),
     url(r'^l4d2/', include('thicc.apps.l4d2.urls')),
     url(r'^gmod/', include('thicc.apps.gmod.urls')),
-    url(r'^wow/', include('thicc.apps.wow.urls')),
-    url(r'^scape/', include('thicc.apps.scape.urls')),
+    # url(r'^wow/', include('thicc.apps.wow.urls')),
+    # url(r'^scape/', include('thicc.apps.scape.urls')),
 
-    url(r'^csgo/', include('thicc.apps.csgo.urls')),
+    # url(r'^csgo/', include('thicc.apps.csgo.urls')),
     url(r'^bans/', include('thicc.apps.bans.urls',  namespace='bans')),
     url(r'^about/', include('thicc.apps.about.urls')),
     url(r'^copyright/', include('thicc.apps.copyright.urls')),
     url(r'^rules/', include('thicc.apps.rules.urls')),
     url(r'^stats/', include('thicc.apps.stats.urls', namespace='stats')),
+    url(r'^unsubscribe/(?P<user_id>\d+)/(?P<token>.*)/$', unsubscribe, name="unsubscribe-email"),
+    url(r'^verifyemail/(?P<user_id>\d+)/(?P<token>.*)/$', verify_email, name="verify-email"),
+
 )
+
+# silk urls https://github.com/jazzband/django-silk
+
+# Django Prometheus https://github.com/korfuri/django-prometheus
 
 if settings.USE_MODELTRANSLATION:
     urlpatterns += [
@@ -144,5 +159,11 @@ urlpatterns += [
 
 # Adds ``STATIC_URL`` to the context of error pages, so that error
 # pages can use JS, CSS and images.
+
+
+    
+
 handler404 = "mezzanine.core.views.page_not_found"
 handler500 = "mezzanine.core.views.server_error"
+#handler404 = "thicc.core.custom_views.page_not_found"
+#handler500 = "thicc.core.custom_views.server_error"

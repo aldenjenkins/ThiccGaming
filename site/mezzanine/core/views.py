@@ -19,7 +19,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.staticfiles import finders
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import (HttpResponse, HttpResponseServerError,
                          HttpResponseNotFound)
 from django.shortcuts import redirect
@@ -30,23 +30,12 @@ from django.views.decorators.csrf import requires_csrf_token
 from mezzanine.conf import settings
 from mezzanine.core.forms import get_edit_form
 from mezzanine.core.models import Displayable, SitePermission
-from mezzanine.utils.cache import add_cache_bypass
-from mezzanine.utils.views import is_editable, paginate, set_cookie
+from mezzanine.utils.views import is_editable, paginate
 from mezzanine.utils.sites import has_site_permission
 from mezzanine.utils.urls import next_url
 
 
 mimetypes.init()
-
-
-def set_device(request, device=""):
-    """
-    Sets a device name in a cookie when a user explicitly wants to go
-    to the site for a particular device (eg mobile).
-    """
-    response = redirect(add_cache_bypass(next_url(request) or "/"))
-    set_cookie(response, "mezzanine-device", device, 60 * 60 * 24 * 365)
-    return response
 
 
 @staff_member_required
@@ -208,7 +197,7 @@ def displayable_links_js(request):
 
 
 @requires_csrf_token
-def page_not_found(request, template_name="errors/404.html"):
+def page_not_found(request, *args, **kwargs):
     """
     Mimics Django's 404 handler but with a different template path.
     """
@@ -216,12 +205,12 @@ def page_not_found(request, template_name="errors/404.html"):
         "STATIC_URL": settings.STATIC_URL,
         "request_path": request.path,
     }
-    t = get_template(template_name)
+    t = get_template(kwargs.get("template_name", "404.html"))
     return HttpResponseNotFound(t.render(context, request))
 
 
 @requires_csrf_token
-def server_error(request, template_name="errors/500.html"):
+def server_error(request, template_name="500.html"):
     """
     Mimics Django's error handler but adds ``STATIC_URL`` to the
     context.

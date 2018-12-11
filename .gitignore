@@ -74,3 +74,12 @@ environment.env
 game-servers/
 *.sql
 old_nginx_for_foobargaming
+data/
+config.monitoring
+alertmanager/config.yml
+prometheus_data/
+passwords/
+flower_backup
+provisioning/
+grafana_data/
+*.copy

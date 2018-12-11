@@ -83,18 +83,19 @@ DEBUG = os.getenv("DEBUG", False)
 
 # URLCONF
 if IS_PROD:
-    ROOT_URLCONF = 'thicc.urls.production'
+    ROOT_URLCONF = 'thicc.urls.common'
     ALLOWED_HOSTS = ['thicc.io', 'www.thicc.io', 'thiccgaming.com', 'www.thiccgaming.com']
 elif DEBUG:
     #ROOT_URLCONF = 'thicc.urls.development'
     ROOT_URLCONF = 'thicc.urls.development'
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 else:
-    ROOT_URLCONF = 'thicc.urls.production'
+    ROOT_URLCONF = 'thicc.urls.common'
     ALLOWED_HOSTS = ['dev.thicc.io']
 
+ADMIN_URL_SLUG = os.getenv("ADMIN_URL", 'admin')
+
 # Setting to turn on featured images for blog posts. Defaults to False.
-#
 BLOG_USE_FEATURED_IMAGE = False
 
 # If True, the django-modeltranslation will be added to the
@@ -162,6 +163,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
     'thicc.core.custom_social_pipelines.get_steam_avatar',
     'thicc.core.custom_social_pipelines.link_to_existing_stat_object',
+    'thicc.core.custom_social_pipelines.send_welcome_mail',
+    'thicc.core.custom_social_pipelines.send_private_message',
     #'thicc.core.custom_social_pipelines.save_profile',
 )
 
@@ -251,6 +254,13 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, STATIC_URL.strip("/"))
 #     os.path.join(BASE_DIR, 'static'),
 # ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    }
+}
+
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_BUCKET")
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {
@@ -322,6 +332,8 @@ INSTALLED_APPS = (
     'thicc.apps.stats',
     'storages',
     'django_celery_beat',
+    'silk',
+    'django_prometheus',
 )
 
 apps = INSTALLED_APPS
@@ -338,7 +350,7 @@ TEMPLATES = [
         "DIRS": [
             os.path.join(PROJECT_ROOT, "templates")
         ],
-        "APP_DIRS": True,
+        #"APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.contrib.auth.context_processors.auth",
@@ -362,6 +374,11 @@ TEMPLATES = [
             "builtins": [
                 "mezzanine.template.loader_tags",
             ],
+            "loaders": [
+                "mezzanine.template.loaders.host_themes.Loader",
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ]
         },
     },
 ]
@@ -370,9 +387,11 @@ TEMPLATES = [
 # List of middleware classes to use. Order is important; in the request phase,
 # these middleware classes will be applied in the order given, and in the
 # response phase the middleware will be applied in reverse order.
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     "mezzanine.core.middleware.UpdateCacheMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'silk.middleware.SilkyMiddleware',
     # Uncomment if using internationalisation or localisation
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -384,8 +403,8 @@ MIDDLEWARE_CLASSES = (
 
     "mezzanine.core.request.CurrentRequestMiddleware",
     "mezzanine.core.middleware.RedirectFallbackMiddleware",
-    "mezzanine.core.middleware.TemplateForDeviceMiddleware",
-    "mezzanine.core.middleware.TemplateForHostMiddleware",
+    #"mezzanine.core.middleware.TemplateForDeviceMiddleware",
+    #"mezzanine.core.middleware.TemplateForHostMiddleware",
     "mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware",
     "mezzanine.core.middleware.SitePermissionMiddleware",
     # Uncomment the following if using any of the SSL settings:
@@ -395,23 +414,30 @@ MIDDLEWARE_CLASSES = (
     "djangobb_forum.middleware.LastLoginMiddleware",
     'djangobb_forum.middleware.UsersOnline',
     'djangobb_forum.middleware.TimezoneMiddleware',
-)
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
+]
 
 
-DEBUG_MIDDLEWARE = (
+DEBUG_MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'django_pdb.middleware.PdbMiddleware',
 
-)
+]
 
 
 def show_the_toolbar(request):
     return request.user.id == 1
 
 
+SILKY_PYTHON_PROFILER = True
+SILKY_AUTHENTICATION = True  # User must login
+SILKY_AUTHORISATION = True  # User must have permissions
+SILKY_PERMISSIONS = lambda user: user.is_superuser
+
+
 if DEBUG:
     INSTALLED_APPS = INSTALLED_APPS + DEBUG_APPS
-    MIDDLEWARE_CLASSES =  MIDDLEWARE_CLASSES + DEBUG_MIDDLEWARE
+    MIDDLEWARE =  MIDDLEWARE + DEBUG_MIDDLEWARE
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': 'thicc.settings.show_the_toolbar',
         # rest of config

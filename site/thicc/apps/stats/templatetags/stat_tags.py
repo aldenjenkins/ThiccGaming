@@ -32,35 +32,39 @@ def gravatar(context, email):
 
 @register.simple_tag(takes_context=True)
 def seconds_to_duration(context, seconds):
-    #seconds  = math.floor((new Date() - date)/1000),
-    interval = math.floor(int(seconds) / 31536000)
-    #  console.log("seconds: " + seconds + " interval: " + interval)
-    if interval >= 1:
-        return str(interval) + " years"
-    interval = math.floor(seconds / 2592000)
-    if interval >= 1:
-        return str(interval) + " months"
-    interval = math.floor(seconds / 86400)
-    if interval >= 1:
-        return str(interval) + " days"
-    interval = math.floor(seconds / 3600)
-    if interval >= 1:
-        return str(interval) + " hours"
-    interval = math.floor(seconds / 60)
-    if interval >= 1:
-        return str(interval) + " minutes"
-    return str(math.floor(seconds)) + " seconds"
+    if seconds != '':
+        #seconds  = math.floor((new Date() - date)/1000),
+        interval = math.floor(int(seconds) / 31536000)
+        #  console.log("seconds: " + seconds + " interval: " + interval)
+        if interval >= 1:
+            return str(interval) + " years"
+        interval = math.floor(seconds / 2592000)
+        if interval >= 1:
+            return str(interval) + " months"
+        interval = math.floor(seconds / 86400)
+        if interval >= 1:
+            return str(interval) + " days"
+        interval = math.floor(seconds / 3600)
+        if interval >= 1:
+            return str(interval) + " hours"
+        interval = math.floor(seconds / 60)
+        if interval >= 1:
+            return str(interval) + " minutes"
+        return str(math.floor(seconds)) + " seconds"
+    return ''
 
 
 @register.simple_tag(takes_context=True)
 def age_from_char_epoch(context, value):
-    now = datetime.now()
-    value = datetime.fromtimestamp(int(value))
-    try:
-        difference = now - value
-    except Exception:
-        return value
+    if value != '':
+        now = datetime.now()
+        value = datetime.fromtimestamp(int(value))
+        try:
+            difference = now - value
+        except Exception:
+            return value
 
-    if difference <= timedelta(minutes=1):
-        return 'just now'
-    return '%(time)s ago' % {'time': timesince(value)}  # .split(', ')[0]}
+        if difference <= timedelta(minutes=1):
+            return 'just now'
+        return '%(time)s ago' % {'time': timesince(value)}  # .split(', ')[0]}
+    return ''
