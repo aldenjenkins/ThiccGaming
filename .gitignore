@@ -83,3 +83,7 @@ flower_backup
 provisioning/
 grafana_data/
 *.copy
+*.password
+celerybeat-schedule
+site/flower
+.env

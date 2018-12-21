@@ -8,9 +8,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'thicc.settings')
 
 #if os.getenv('IS_DEVELOPMENT', False) or settings.DEBUG:
 BROKER_URL = [
-    # 'redis://%s:6379/0' % url
+    'redis://redis:6379/0'
     #'amqp://guest@localhost//' # for non dockerized rabbitmq
-    'amqp://{}:{}@rabbitmq//'.format(settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD) # for dockerized rabbitmq
+    #'amqp://{}:{}@rabbitmq//'.format(settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD) # for dockerized rabbitmq
 ]
 #else:
 #    BROKER_URL = [
@@ -32,13 +32,18 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 #     url = os.getenv('DEV_REDIS_MASTER_SERVICE_HOST', 'localhost')
 # app.conf.broker_url = 'redis://%s:6379/0' % url
 
-
+app.conf.beat_schedule = {
+    'update-game-info-every-30-seconds': {
+        'task': 'thicc.celery_tasks.tasks.update_game_server_info',
+        'schedule': 30.0,
+    },
+}
 
 
 # # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
-#
-#
+
+
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))

@@ -5,6 +5,9 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.template.loader import get_template
+from thicc.celery_tasks.tasks import send_email
+from thicc.core.custom_social_pipelines import get_token_for_user
 
 # favour django-mailer but fall back to django.core.mail
 
@@ -57,34 +60,39 @@ def format_subject(subject):
     }
     
 def new_message_email(sender, instance, signal, 
-        subject_prefix=_(u'New Message: %(subject)s'),
-        template_name="django_messages/new_message.html",
-        default_protocol=None,
-        *args, **kwargs):
-    """
-    This function sends an email and is called via Django's signal framework.
-    Optional arguments:
-        ``template_name``: the template to use
-        ``subject_prefix``: prefix for the email subject.
-        ``default_protocol``: default protocol in site URL passed to template
-    """
-    if default_protocol is None:
-        default_protocol = getattr(settings, 'DEFAULT_HTTP_PROTOCOL', 'http')
+            subject_prefix=_(u'New Message: %(subject)s'),
+            template_name="django_messages/new_message.html",
+            default_protocol=None,
+            *args, **kwargs):
+        """
+        This function sends an email and is called via Django's signal framework.
+        Optional arguments:
+            ``template_name``: the template to use
+            ``subject_prefix``: prefix for the email subject.
+            ``default_protocol``: default protocol in site URL passed to template
+        """
+        if not instance.recipient.forum_profile.email_unsubscribed:
+            if default_protocol is None:
+                default_protocol = getattr(settings, 'DEFAULT_HTTP_PROTOCOL', 'http')
 
-    if 'created' in kwargs and kwargs['created']:
-        try:
-            current_domain = Site.objects.get_current().domain
-            subject = subject_prefix % {'subject': instance.subject}
-            message = render_to_string(template_name, {
-                'site_url': '%s://%s' % (default_protocol, current_domain),
-                'message': instance,
-            })
-            if instance.recipient.email != "":
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
-                    [instance.recipient.email,])
-        except Exception as e:
-            #print e
-            pass #fail silently
+            if 'created' in kwargs and kwargs['created']:
+                    current_domain = Site.objects.get_current().domain
+                    subject = subject_prefix % {'subject': instance.subject}
+                    plaintext = get_template('django_messages/new_message.txt')
+                    html = get_template('django_messages/new_message.html')
+
+                    d = {'site_url': '%s://%s' % (default_protocol, current_domain),
+                         'message': instance,
+                         'user_id': instance.recipient.id,
+                         'token': get_token_for_user(instance.recipient)
+                         }
+
+                    text_content = plaintext.render(d)
+                    html_content = html.render(d)
+                    
+                    send_email.delay(subject, text_content,
+                        html_content, settings.PM_FROM_EMAIL, 
+                        instance.recipient.email)
 
 
 def get_user_model():

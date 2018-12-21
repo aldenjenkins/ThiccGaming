@@ -1,12 +1,16 @@
 version: "2"
 
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
 services:
   nginx:
     restart: always
     # build: ./nginx/
     # image: nginx:1.13
     image: jwilder/nginx-proxy
-    container_name: nginx-container
+    container_name: nginx
     env_file: ./nginx/environment.env
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
@@ -14,7 +18,6 @@ services:
       - ./nginx/passwords:/etc/nginx/htpasswd
     ports:
       - 80:80
-      - 443:443
     networks:
       - nginx_network
 
@@ -23,11 +26,11 @@ services:
     build: ./site/
     container_name: django
     env_file: ./site/environment.env
+    stdin_open: true
+    tty: true
     environment:
-      - VIRTUAL_HOST=localhost
+      - VIRTUAL_HOST=${WEB_DOMAIN}
       - VIRTUAL_PORT=8000
-    #ports:
-    #  - 8000:8000
     volumes:
       - ./site/:/opt/services/thiccsite/src
     depends_on: 
@@ -36,54 +39,85 @@ services:
     networks:
      - nginx_network
      - mysql_network
-     - rabbitmq_network
+     - redis_network
     command: gunicorn -b :8000 --reload thicc.wsgi:application
 
   celery:
     restart: always
+    container_name: celery
     build: ./site
     env_file: ./site/environment.env
     volumes:
       - ./site/:/opt/services/thiccsite/src
     depends_on: 
      - mysql-site
-     - rabbitmq
+     - redis
     networks:
      - mysql_network
-     - rabbitmq_network
-    command: celery -E -A thicc.celery_tasks worker --loglevel=info
+     - redis_network
+    command: celery -E -A thicc.celery_tasks worker -B --loglevel=debug 
 
-  flowr:
+  flower:
     restart: always
+    container_name: flower
     build: ./site
     env_file: ./site/environment.env
-    # ports:
-    #   - 5555:5555
+    ports:
+      - 5555:5555
     volumes:
      - ./site/:/opt/services/thiccsite/src
-     - ./flower/flower_backup:/flower/flower
     environment:
-      - VIRTUAL_HOST=flower.localhost
+      - VIRTUAL_HOST=${FLOWER_SUBDOMAIN}.${WEB_DOMAIN}
       - VIRTUAL_PORT=5555
     depends_on: 
      - nginx
      - mysql-site
-     - rabbitmq
+     - redis
     networks:
      - nginx_network
      - mysql_network
-     - rabbitmq_network
-    command: celery flower -A thicc.celery_tasks --loglevel=info --persistent=True --db=/flower/flower
+     - redis_network
+    command: celery flower -A thicc.celery_tasks --loglevel=info --persistent=True  --broker_api=redis://redis:6379/0
 
-  rabbitmq:
+
+  redis:
     restart: always
-    env_file: ./rabbitmq/environment.env
-    image: "rabbitmq:3-management"
+    container_name: redis
+    image: "redis:latest"
+    # volumes:
+      #- ./redis/redis.conf:/var/lib/redis/redis.conf
+      # image: "deadtrickster/redis_prometheus"
     networks:
-     - rabbitmq_network
+     - redis_network
+
+  redis-exporter:
+    restart: always
+    container_name: redis-exporter
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    image:
+      "oliver006/redis_exporter"
+    networks:
+     - prometheus_network
+     - redis_network
+
+ #redis:
+ #  restart: always
+ #  container_name: redis
+ #  env_file: ./redis/environment.env
+ #  environment:
+ #    - VIRTUAL_HOST=redis.localhost
+ #    - VIRTUAL_PORT=15672
+ #  image: "redis:3-management"
+ #  volumes:
+ #    - ./redis/redis.conf:/var/lib/redis/redis.conf
+ #  # image: "deadtrickster/redis_prometheus"
+ #  networks:
+ #   - redis_network
 
   mysql-site:
     restart: always
+    container_name: mysql-site
     image: mysql:5.7.19
     volumes:
       - /opt/services/sitedb/:/var/lib/mysql
@@ -116,12 +150,10 @@ services:
     environment:
      - PMA_ARBITRARY=1
     restart: always
-    # ports:
-    # - 8081:80
     volumes:
      - /sessions
     environment:
-      - VIRTUAL_HOST=myadmin.localhost
+      - VIRTUAL_HOST=${MYADMIN_SUBDOMAIN}.${WEB_DOMAIN}
       - VIRTUAL_PORT=8080
     depends_on: 
      - nginx
@@ -132,64 +164,74 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
+    container_name: prometheus
     volumes:
       - ./prometheus/:/etc/prometheus/
-      - ./prometheus_data:/prometheus
-    # ports:
-    #  - 9090:9090
+      - prometheus_data:/prometheus
     environment:
-      - VIRTUAL_HOST=prom.localhost
-      - VIRTUAL_PORT=9090
+      - VIRTUAL_HOST=${PROMETHEUS_SUBDOMAIN}.${WEB_DOMAIN}
+      - VIRTUAL_PORT=8080
     command:
       # Use the prometheus.yml located in ./prometheus
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--log.level=debug'
     depends_on:
+      - node-exporter
+      - alertmanager
       - cadvisor
       - nginx
+      - redis-exporter
+      - mysql-exporter
     networks:
       - nginx_network
+      - prometheus_network
+    restart: always
+
+  mysql-exporter:
+    image: prom/mysqld-exporter
+    container_name: mysql-exporter
+    env_file: ./mysqld-exporter/environment.env
+    environment:
+      - VIRTUAL_HOST=mysqlexporter.localhost
+      - VIRTUAL_PORT=9104
+    depends_on:
+      - nginx
+      - mysql-site
+    networks:
+      - nginx_network
+      - mysql_network
+      - prometheus_network
     restart: always
 
   node-exporter:
     image: prom/node-exporter
+    container_name: node-exporter
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-    environment:
-      - VIRTUAL_HOST=node.localhost
-      - VIRTUAL_PORT=9100
     command: 
       - '--path.procfs=/host/proc' 
       - '--path.sysfs=/host/sys'
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
-    # ports:
-    #  - 9100:9100
-    depends_on:
-      - nginx
     networks:
-      - nginx_network
+      - prometheus_network
     restart: always
-    # deploy:
-    #  mode: global
 
   alertmanager:
     image: prom/alertmanager
-    # ports:
-    #  - 9093:9093
+    container_name: alertmanager
     volumes:
       - ./alertmanager/:/etc/alertmanager/
     environment:
-      - VIRTUAL_HOST=alert.localhost
+      - VIRTUAL_HOST=${ALERTMANAGER_SUBDOMAIN}.${WEB_DOMAIN}
       - VIRTUAL_PORT=9093
-    depends_on:
-      - nginx
     networks:
-      - nginx_network
+      - prometheus_network
     restart: always
     command:
       - '--config.file=/etc/alertmanager/config.yml'
@@ -197,42 +239,34 @@ services:
 
   cadvisor:
     image: google/cadvisor
-    environment:
-      - VIRTUAL_HOST=cadvisor.localhost
-      - VIRTUAL_PORT=8080
+    container_name: cadvisor
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    # ports:
-    #  - 8080:8080
     networks:
-      - nginx_network
+      - prometheus_network
     restart: always
-    # deploy:
-    #  mode: global
 
   grafana:
     image: grafana/grafana
+    container_name: grafana
     user: "1000"
     environment:
-      - VIRTUAL_HOST=grafana.localhost
+      - VIRTUAL_HOST=${GRAFANA_SUBDOMAIN}.${WEB_DOMAIN}
       - VIRTUAL_PORT=3000
-    depends_on:
-      - prometheus
-    # ports:
-    #  - 3000:3000
     volumes:
-      - ./grafana_data:/var/lib/grafana
-      #- ./grafana/provisioning/:/etc/grafana/provisioning/
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
     env_file:
       - ./grafana/config.monitoring
     depends_on:
       - nginx
+      - prometheus
     networks:
       - nginx_network
-      - mysql_network
+      - prometheus_network
     restart: always
 
 networks:
@@ -242,6 +276,8 @@ networks:
     driver: bridge
   # mysql2_network:
   # driver: bridge
-  rabbitmq_network:
+  redis_network:
+    driver: bridge
+  prometheus_network:
     driver: bridge
 

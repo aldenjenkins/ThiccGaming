@@ -35,7 +35,7 @@ urlpatterns = i18n_patterns(
     #url(r'^prometheus/', include('django_prometheus.urls', namespace='prometheus')),
     #url(r'^metrics$', user_passes_test(lambda u: u.is_staff)(exports.ExportToDjangoView), name='prometheus-django-metrics'),
     url(r'^metrics$', exports.ExportToDjangoView, name='prometheus-django-metrics'),
-    url(r'^silk/', include('silk.urls', namespace='silk')),
+    #url(r'^silk/', include('silk.urls', namespace='silk')),
     url(r'^game_info/', include('game_info.urls')),
     url(r'^donate/', include('thicc.apps.donations.urls')),
     # url(r'^forum/user/(?P<username>.*)/social/$', login_required(TemplateView.as_view(template_name='profile_social.html'))),

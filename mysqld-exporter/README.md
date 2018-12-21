@@ -1,0 +1,6 @@
+https://github.com/prometheus/mysqld_exporter
+
+says you must run
+
+CREATE USER 'exporter'@'localhost' IDENTIFIED BY 'XXXXXXXX' WITH MAX_USER_CONNECTIONS 3;
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'localhost';

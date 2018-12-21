@@ -1,0 +1,12 @@
+{% load i18n %}
+
+{% blocktrans with recipient=message.recipient sender=message.sender %}Hello {{ recipient }},
+
+you received a private message from {{ sender }} with
+the following contents:{% endblocktrans %}
+
+
+{{ message.body|safe }}
+
+
+Unsubscribe to all emails from {{ site_url }} here: http://thicc.io/unsubscribe/{{ message.recipient.id }}/{{ message.recipient.token }}/

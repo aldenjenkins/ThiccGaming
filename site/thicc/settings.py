@@ -84,14 +84,14 @@ DEBUG = os.getenv("DEBUG", False)
 # URLCONF
 if IS_PROD:
     ROOT_URLCONF = 'thicc.urls.common'
-    ALLOWED_HOSTS = ['thicc.io', 'www.thicc.io', 'thiccgaming.com', 'www.thiccgaming.com']
+    ALLOWED_HOSTS = ['localhost','django', 'thicc.io', 'www.thicc.io', 'thiccgaming.com', 'www.thiccgaming.com']
 elif DEBUG:
     #ROOT_URLCONF = 'thicc.urls.development'
     ROOT_URLCONF = 'thicc.urls.development'
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ['django', 'localhost', '127.0.0.1']
 else:
     ROOT_URLCONF = 'thicc.urls.common'
-    ALLOWED_HOSTS = ['dev.thicc.io']
+    ALLOWED_HOSTS = ['localhost','django', 'dev.thicc.io']
 
 ADMIN_URL_SLUG = os.getenv("ADMIN_URL", 'admin')
 
@@ -212,16 +212,6 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'metoo_db'),
-        'USER': os.getenv('DB_USER', 'metoo_admin'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
-        'HOST': os.getenv('DOCKER_DB_NAME', 'mysql1'),
-        'PORT': os.getenv('DB_PORT', 5432)
-    }
-}
 
 RCON_PASSWORD = os.getenv('RCON_PASSWORD', '')
 
@@ -254,11 +244,34 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, STATIC_URL.strip("/"))
 #     os.path.join(BASE_DIR, 'static'),
 # ]
 
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',
+#        'LOCATION': '/var/tmp/django_cache',
+#    }
+#}
+
 CACHES = {
     'default': {
-        'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
-    }
+        #'BACKEND': 'redis_cache.RedisCache',
+        'BACKEND': 'django_prometheus.cache.backends.redis.RedisCache',
+        "LOCATION": "redis://redis:6379/1",
+        #'LOCATION': [
+        #    '%s:%s' % (os.getenv('PROD_REDIS_MASTER_SERVICE_HOST', '127.0.0.1'),
+        #               os.getenv('PROD_REDIS_MASTER_SERVICE_PORT', 6379)),
+        #    '%s:%s' % (os.getenv('PROD_REDIS_SLAVE_SERVICE_HOST', '127.0.0.1'),
+        #               os.getenv('PROD_REDIS_SLAVE_SERVICE_PORT', 6379))
+        #
+        # ],
+        'OPTIONS': {
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'PICKLE_VERSION': 2,
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        #    'MASTER_CACHE': '%s:%s' % (
+        #        os.getenv('PROD_REDIS_MASTER_SERVICE_HOST', '127.0.0.1'),
+        #        os.getenv('PROD_REDIS_MASTER_SERVICE_PORT', 6379))
+        },
+    },
 }
 
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_BUCKET")
@@ -332,14 +345,14 @@ INSTALLED_APPS = (
     'thicc.apps.stats',
     'storages',
     'django_celery_beat',
-    'silk',
+    #'silk',
     'django_prometheus',
 )
 
 apps = INSTALLED_APPS
 
 DEBUG_APPS = (
-    'debug_toolbar',
+    #'debug_toolbar',
     #'django_pdb',
 )
 
@@ -391,7 +404,7 @@ MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     "mezzanine.core.middleware.UpdateCacheMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'silk.middleware.SilkyMiddleware',
+    #'silk.middleware.SilkyMiddleware',
     # Uncomment if using internationalisation or localisation
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -419,7 +432,8 @@ MIDDLEWARE = [
 
 
 DEBUG_MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'thicc.core.custom_middleware.ProfilerMiddleware',
     #'django_pdb.middleware.PdbMiddleware',
 
 ]
@@ -429,15 +443,17 @@ def show_the_toolbar(request):
     return request.user.id == 1
 
 
-SILKY_PYTHON_PROFILER = True
-SILKY_AUTHENTICATION = True  # User must login
-SILKY_AUTHORISATION = True  # User must have permissions
-SILKY_PERMISSIONS = lambda user: user.is_superuser
+#SILKY_PYTHON_PROFILER = True
+#SILKY_AUTHENTICATION = True  # User must login
+#SILKY_AUTHORISATION = True  # User must have permissions
+#SILKY_PERMISSIONS = lambda user: user.is_superuser
+#
+#SILKY_META = True
 
 
 if DEBUG:
     INSTALLED_APPS = INSTALLED_APPS + DEBUG_APPS
-    MIDDLEWARE =  MIDDLEWARE + DEBUG_MIDDLEWARE
+    MIDDLEWARE = MIDDLEWARE + DEBUG_MIDDLEWARE
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': 'thicc.settings.show_the_toolbar',
         # rest of config
@@ -462,7 +478,6 @@ PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
 
 # These will be added to ``INSTALLED_APPS``, only if available.
 OPTIONAL_APPS = (
-    "debug_toolbar",
     "django_extensions",
     "compressor",
     "coverage",
@@ -556,6 +571,7 @@ EMAIL_BACKEND = 'django_amazon_ses.EmailBackend'
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = os.getenv("MAIL_FROM")
+PM_FROM_EMAIL = os.getenv("PM_MAIL_FROM")
 
 OWNER_EMAIL = os.getenv("OWNER_EMAIL")
 

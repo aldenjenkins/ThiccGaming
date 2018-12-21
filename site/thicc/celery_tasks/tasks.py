@@ -16,6 +16,11 @@ from django.contrib.auth import get_user_model
 #from twilio.rest import Client
 #client = Client()
 
+#@app.on_after_configure.connect
+#def setup_periodic_tasks(sender, **kwargs):
+#    # Calls test('world') every 30 seconds
+#    sender.add_periodic_task(30.0, update_game_server_info.s(), expires=25, name='add every 10')
+
 @app.task(ignore_result=True)
 def update_game_server_info():
     for server in Server.objects.all():
@@ -25,11 +30,6 @@ def update_game_server_info():
             server.update_players()
         if server.get_rules:
             server.update_rules()
-
-#@app.task(ignore_result=True)
-#def send_email(user_id, title, message):
-#    user = settings.AUTH_USER_MODEL.objects.get(pk=user_id)
-#    send_mail(user, title, message)
 
 
 @app.task(ignore_result=True)

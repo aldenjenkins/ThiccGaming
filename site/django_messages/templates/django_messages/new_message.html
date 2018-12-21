@@ -1,13 +1,179 @@
+{% comment %}
 {% load i18n %}
 
 {% blocktrans with recipient=message.recipient sender=message.sender %}Hello {{ recipient }},
 
-you received a private message from {{ sender }} with
+you received a private message from <a href="{% url 'djangobb:forum_profile' sender %}">{{ sender }}</a> with
 the following contents:{% endblocktrans %}
-
-{{ message.body|safe }}
-
---
-{% blocktrans %}Sent from {{ site_url }}{% endblocktrans %}
-{% trans "Inbox" %}: {{ site_url }}{% url 'messages_inbox' %}
-{% trans "Reply" %}: {{ site_url }}{% url 'messages_reply' message.pk %}     
+{% endcomment %}
+<!doctype html>
+{% load i18n static %}
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+    <link rel="stylesheet" href="https://thicc.s3.amazonaws.com/static/css/styles-main.css">
+    <script type="text/javascript">
+        function twitterLink(){
+            if( /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) window.location = "twitter://user?screen_name=thiccgaming"
+            else window.location = "https://twitter.com/thiccgaming";
+        }
+        function instagramLink(){
+            if( /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) window.location = "instagram://user?username=thiccgaming"
+            else window.location = "https://instagram.com/thiccgaming";
+        }
+    </script>
+    <title>New Message From {{ message.sender }}!</title>
+    <style>
+    @media only screen and (max-width: 620px) {
+        table[class=body] .logo-img {
+            margin-left: 13%;
+            margin-bottom: 10px
+        }
+      table[class=body] h1 {
+        font-size: 28px !important;
+        margin-bottom: 10px !important;
+      }
+      table[class=body] p,
+            table[class=body] ul,
+            table[class=body] ol,
+            table[class=body] td,
+            table[class=body] span,
+            table[class=body] a {
+        font-size: 16px !important;
+      }
+      table[class=body] .wrapper,
+            table[class=body] .article {
+        padding: 10px !important;
+      }
+      table[class=body] .content {
+        padding: 0 !important;
+      }
+      table[class=body] .container {
+        padding: 0 !important;
+        width: 100% !important;
+      }
+      table[class=body] .main {
+        border-left-width: 0 !important;
+        border-radius: 0 !important;
+        border-right-width: 0 !important;
+      }
+      table[class=body] .btn table {
+        width: 50% !important;
+      }
+      table[class=body] .btn a {
+        width: 100% !important;
+      }
+      table[class=body] .img-responsive {
+        height: auto !important;
+        max-width: 100% !important;
+        width: auto !important;
+      }
+    }
+    @media all {
+      .ExternalClass {
+        width: 100%;
+      }
+      .ExternalClass,
+            .ExternalClass p,
+            .ExternalClass span,
+            .ExternalClass font,
+            .ExternalClass td,
+            .ExternalClass div {
+        line-height: 100%;
+      }
+      .apple-link a {
+        color: #3fbdff !important;
+        font-family: inherit !important;
+        font-size: inherit !important;
+        font-weight: inherit !important;
+        line-height: inherit !important;
+        text-decoration: none !important;
+      }
+      .btn-primary table td:hover {
+        background-color: #3fbdff !important;
+      }
+      .btn-primary a:hover {
+        background-color: #3fbdff !important;
+        border-color: #3fbdff !important;
+      }
+      .social-top {
+        align-content: center;
+        justify-content: center;
+      }
+      .social-top a {
+            margin: 0 40px;
+            color: #3fbdff
+        }
+    .logo-img {
+        display: block;
+        margin: auto;
+        margin-bottom: 25px;
+    }
+    }
+    </style>
+  </head>
+  <body class="" style="background-color: #f6f6f6; font-family: 'Open Sans', Calibri, Trebuchet, sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;">
+    <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: #f6f6f6;">
+      <tr>
+        <td style="font-family: 'Open Sans', Calibri, Trebuchet, sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
+        <td class="container" style="font-family: 'Open Sans', Calibri, Trebuchet, sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 10px; width: 580px;">
+          <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
+            <table class="main" style="box-shadow:0px 1px 1px 0px rgba(0, 0, 0, 0.12); border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
+                <tr>
+                <td class="wrapper" style="font-family: 'Open Sans', Calibri, Trebuchet, sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px;">
+                    <a href="https://thicc.io"><img class="logo-img" src="{% static "thiccgamingbanner.png" %}" style="align-self: center;"/></a>
+                  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+                    <tr>
+                      <td style="font-size: 14px; vertical-align: top;">
+                        <p style="font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">You have a new messsage from {{ message.sender }} in your inbox.</p>
+			    <div id="content-main" class="col s12 m12 l9 push-l3 forum forum-messages" style="background-color:#f6f6f6;">
+                             <h3>Message Details</h3>
+                             <h5>Subject: <b>{{ message.subject|safe }}</b></h5>
+                             <div style="background-color:#e4f4ff; padding: 10px;" class="messages-user-detail">
+                               <a style="vertical-align:top;" href="{{ site_url }}{% url 'djangobb:forum_profile' message.sender.username %}" class="forum-username">
+                                 <img width="60px" src="{{ message.sender.forum_profile.avatar }}" alt="User Avatar" class="left avatar-messages">
+                               </a>
+                               <a style="vertical-align:top;" href="{{ site_url }}{% url 'djangobb:forum_profile' message.sender.username %}" class="forum-username">{{ message.sender }}</a> 
+                               <p style="vertical-align:top; display:inline;">at {{ message.sent_at }}</p>
+                               <div class="clearfix"></div>
+                               </div>
+                               <blockquote>&quot;{{ message.body|safe }}&quot;</blockquote>
+                               <div style="padding-bottom: 10px;">
+                                 <a href="{{ site_url }}/messages/reply/{{ message.id }}/" style="margin-left:25%;" class="btn-flat"><span class="hide-on-small-only">Reply&nbsp;</span><i class="fa fa-fw fa-sm fa-reply"></i></a>
+                                 <a href="{{ site_url }}/messages/reply/{{ message.id }}/" style="margin-left:25%;" class="btn-flat"><span class="hide-on-small-only">View&nbsp;</span><i class="far fa-envelope-open"></i></a>
+                               </div>
+                             </div>
+                        <div class="social-top" style="text-align: center; margin-top: 25px " >
+                            <a href="javascript:twitterLink()" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                            <a href="javascript:instagramLink()" target="_blank"><i class="fab fa-instagram fa-2x"></i></a>
+                            <a href="https://discord.gg/NXC4rw6" target="_blank"><i class="fab fa-discord fa-2x"></i></a>
+                            <a href="https://github.com/aldenjenkins/ThiccGaming" target="_blank"><i class="fab fa-github fa-2x" aria-hidden="true"></i></a>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <div class="footer" style="clear: both; Margin-top: 10px; text-align: center; width: 100%;">
+              <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+                <tr>
+                  <td class="content-block" style="font-family: 'Open Sans', Calibri, Trebuchet, sans-serif; vertical-align: top; flex-direction: column; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
+                    <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">
+                        Thicc Gaming
+                    </span>
+                  </td>
+                </tr>
+                </td>
+              </table>
+              <p style="color: #999999;">Don't like these emails? <a href="https://thicc.io/unsubscribe/{{ user_id }}/{{ token }}/" style="text-decoration: underline; color: #526799; font-size: 12px; text-align: center;">Unsubscribe</a>.</p>
+            </div>
+          </div>
+        </td>
+        <td style="font-family: 'Open Sans', Calibri, Trebuchet, sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
+      </tr>
+    </table>
+  </body>
+</html>
