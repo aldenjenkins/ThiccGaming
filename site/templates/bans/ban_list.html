@@ -16,6 +16,9 @@
 
 {% block main_content %}
 
+<form method='GET' action=''>
+<input id="main-nav-search-input" type="search" name="q" placeholder="Search bans by username or steam64..." value={{ request.GET.q }}>
+</form>
 {#    {% block messages %}#}
 {#        {% if messages %}#}
 {#        <div id="messages">#}

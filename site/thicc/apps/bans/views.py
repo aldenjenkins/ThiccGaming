@@ -12,6 +12,7 @@ from django.urls import reverse
 from .forms import BanForm, UnbanForm, CommentForm, RebanForm
 from .models import Ban, Comment
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 
 # Base steamid
@@ -50,12 +51,15 @@ def commid_to_steam3(commid):
     return "[U:{}:{}]".format(Y, difference)
 
 
-
 def index(request):
     unban_form = UnbanForm()
     comment_form = CommentForm()
     reban_form = RebanForm()
-    bans = Ban.objects.all()
+    query = request.GET.get('q')
+    if query:
+        bans = Ban.objects.filter(Q(name__icontains=query) | Q(authid=query)).distinct()
+    else:
+        bans = Ban.objects.all()
     num_bans = bans.count()
 
     # Show 16 bans per page.
@@ -260,6 +264,7 @@ def unban(request, bid):
     # user hits the Back button.
     return HttpResponseRedirect(reverse('bans:index'))
 
+
 @login_required
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -268,6 +273,7 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
 
 @login_required
 def ban(request):
@@ -321,6 +327,7 @@ def comment(request, bid):
     # with POST data. This prevents data from being posted twice if a
     # user hits the Back button.
     return HttpResponseRedirect(reverse('bans:index'))
+
 
 @login_required
 def reban(request, bid):

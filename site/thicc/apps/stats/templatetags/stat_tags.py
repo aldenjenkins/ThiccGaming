@@ -31,26 +31,26 @@ def gravatar(context, email):
 
 
 @register.simple_tag(takes_context=True)
-def seconds_to_duration(context, seconds):
-    if seconds != '':
+def minutes_to_duration(context, minutes):
+    if minutes != '':
         #seconds  = math.floor((new Date() - date)/1000),
-        interval = math.floor(int(seconds) / 31536000)
+        interval = math.floor(int(minutes) / 31536000)
         #  console.log("seconds: " + seconds + " interval: " + interval)
         if interval >= 1:
             return str(interval) + " years"
-        interval = math.floor(seconds / 2592000)
+        interval = math.floor(minutes / 2592000)
         if interval >= 1:
             return str(interval) + " months"
-        interval = math.floor(seconds / 86400)
+        interval = math.floor(minutes / 86400)
         if interval >= 1:
             return str(interval) + " days"
-        interval = math.floor(seconds / 3600)
+        interval = math.floor(minutes / 3600)
         if interval >= 1:
             return str(interval) + " hours"
-        interval = math.floor(seconds / 60)
+        interval = math.floor(minutes / 60)
         if interval >= 1:
             return str(interval) + " minutes"
-        return str(math.floor(seconds)) + " seconds"
+        return str(math.floor(minutes)) + " minutes"
     return ''
 
 

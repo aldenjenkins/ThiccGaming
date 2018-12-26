@@ -191,7 +191,6 @@ class UserStats(ExportModelOperationsMixin('userstats'), models.Model):
     def l4d2_stats(self):
         return {
             "Points": self.l4d2_points,
-            "Total Playtime": self.l4d2_playtime,
             "Points Infected": self.l4d2_points_infected,
             "Points Survivor": self.l4d2_points_survivor,
             "Friendly Fires": self.l4d2_friendly_fire,

@@ -2,17 +2,13 @@ from django.shortcuts import render
 from game_info.models import Player
 
 
-
 def index(request):
     current_players = get_current_players()
-    return render(request, 'l4d2/l4d2.html', {'current_players' : current_players})
-
-
+    return render(request, 'l4d2/l4d2.html', {'current_players': current_players})
 
 
 def banner(request):
     return render(request, 'l4d2/banner.html')
-
 
 
 def get_current_players():

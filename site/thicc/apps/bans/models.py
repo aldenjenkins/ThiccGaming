@@ -7,29 +7,9 @@ from time import timezone
 
 # from .etc import getSteamFrom64
 
+
 @python_2_unicode_compatible
 class Ban(models.Model):
-
-    # for mysql
-    # bid        = models.IntegerField(primary_key=True)
-    # ip         = models.CharField(max_length=32)
-    # authid     = models.CharField(max_length=64)
-    # name       = models.CharField(max_length=128)
-    # created    = models.IntegerField(max_length=11)
-    # ends       = models.IntegerField(max_length=11)
-    # length     = models.IntegerField(max_length=10)
-    # reason     = models.TextField()
-    # aid        = models.IntegerField(max_length=6)
-    # adminIp    = models.CharField(max_length=32)
-    # sid        = models.IntegerField(max_length=6)
-    # country    = models.CharField(max_length=4)
-    # RemovedBy  = models.IntegerField(max_length=8)
-    # RemoveType = models.CharField(max_length=3)
-    # RemovedOn  = models.IntegerField(max_length=10)
-    # type       = models.SmallIntegerField(max_length=4)
-    # ureason    = models.TextField()
-
-    # for sqlite
     bid = models.AutoField(primary_key=True)
     ip = models.CharField(max_length=32, null=True)
     authid = models.CharField(max_length=64)
@@ -47,18 +27,14 @@ class Ban(models.Model):
     RemovedOn = models.IntegerField(null=True)
     type = models.SmallIntegerField(null=False, default=0)
     ureason = models.TextField(null=True)
-    # comments   = models.TextField(null=True, blank=True)
-
 
     class Meta:
-        ordering            = ["-created"]
-        verbose_name        = "Game-only Ban"
+        ordering = ["-created"]
+        verbose_name = "Game-only Ban"
         verbose_name_plural = "Game-only Bans"
 
     def __str__(self):
         return self.name
-
-
 
 
 @python_2_unicode_compatible
@@ -75,6 +51,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return "{}: {}".format(self.commenter, self.comment)
+
 
 @python_2_unicode_compatible
 class Group(models.Model):

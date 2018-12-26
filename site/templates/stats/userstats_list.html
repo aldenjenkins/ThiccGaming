@@ -13,8 +13,10 @@
         </div>
     </div>
 {% endblock %}
-
 {% block main_content %}
+<form method='GET' action=''>
+<input id="main-nav-search-input" type="search" name="q" placeholder="Search stats by username or steam64..." value={{ request.GET.q }}>
+</form>
 
 {#    {% block messages %}#}
 {#        {% if messages %}#}
@@ -40,9 +42,9 @@
             <div style="background-color:lightgrey;">
                 {% if stats_list %}
                     <h3 style="float: left;">Stats</h3>
-                    <h5 style="float: right;">Page {{ page_obj.count }}</h5>
+                    <h5 style="float: right;">Page {{ page_obj.number }}</h5>
                 {% else %}
-                    <h3 style="float: left;">No Stats yet. Be the first one to join the game!</h3>
+                    <h3 style="float: left;">No Stats Found</h3>
                 {% endif %}
             </div>
 
@@ -51,7 +53,6 @@
             {% include 'stats/userstats_table.html' %}
 
     </div>
-
 
     {% if page_obj.has_previous or page_obj.has_next %}
         <ul class="pagination {{ text_align|default:'center-align' }}">
@@ -67,9 +68,11 @@
             <li{% if page_obj.number == 2 %} class="active"{% endif %}>
                 <a href="?page=2{% if querystring %}&{{ querystring }}{% endif %}">2</a>
             </li>
+            {% if page_obj.num_pages > 2 %}
             <li{% if page_obj.number == 3 %} class="active"{% endif %}>
                 <a href="?page=3{% if querystring %}&{{ querystring }}{% endif %}">3</a>
             </li>
+            {% endif %}
             <li>
                 <p>...</p>
             </li>
@@ -84,6 +87,7 @@
             </li>
         </ul>
     {% endif %}
+
 {##}
 {#<script>#}
 {#$(document).ready(function(){#}

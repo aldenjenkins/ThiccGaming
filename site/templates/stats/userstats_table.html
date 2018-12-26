@@ -37,10 +37,10 @@
                 {{ stat.total_points }}
             </td>
             <td>
-                {% seconds_to_duration stat.total_playtime %}
+                {% minutes_to_duration stat.total_playtime %}
             </td>
             <td>
-                {% age_from_char_epoch stat.last_online %} ago
+                {% age_from_char_epoch stat.last_online %}
             </td>
         </tr>
         <tr class="ban-info" style="display:none">
@@ -98,7 +98,7 @@
                                                <tr align="left">
                                                    <td width="30%">Play Time</td>
                                                    <td>
-                                                       {% seconds_to_duration stat.l4d2_playtime %}
+                                                       {% minutes_to_duration stat.l4d2_playtime %}
                                                    </td>
                                                </tr>
                                                {% for key, attribute in stat.l4d2_stats.items %}
@@ -127,7 +127,7 @@
                                                <tr align="left">
                                                    <td width="30%">Play Time</td>
                                                    <td>
-                                                       {% seconds_to_duration stat.gmodzs_playtime %}
+                                                       {% minutes_to_duration stat.gmodzs_playtime %}
                                                    </td>
                                                </tr>
                                                {% for key, attribute in stat.gmodzs_stats.items %}

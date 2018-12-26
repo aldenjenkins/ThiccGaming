@@ -147,14 +147,13 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
-    environment:
-     - PMA_ARBITRARY=1
     restart: always
-    volumes:
-     - /sessions
+    env_file: ./phpmyadmin/environment.env
     environment:
       - VIRTUAL_HOST=${MYADMIN_SUBDOMAIN}.${WEB_DOMAIN}
-      - VIRTUAL_PORT=8080
+      - VIRTUAL_PORT=80
+    links:
+     - "mysql-site:mysql-site"
     depends_on: 
      - nginx
      - mysql-site
