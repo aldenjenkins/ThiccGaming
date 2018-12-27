@@ -153,8 +153,13 @@ class UserStats(ExportModelOperationsMixin('userstats'), models.Model):
     l4d2_award_defib = models.IntegerField(blank=True, default=0)
     l4d2_award_protect = models.IntegerField(blank=True, default=0)
     l4d2_award_revive = models.IntegerField(blank=True, default=0)
-    l4d2_award_teamkill = models.IntegerField(blank=True, default=0)
     l4d2_award_scatteringram = models.IntegerField(blank=True, default=0)
+    l4d2_award_teamkill = models.IntegerField(blank=True, default=0)
+    l4d2_award_tankkillnodeaths = models.IntegerField(blank=True, default=0)
+    l4d2_award_hunter = models.IntegerField(blank=True, default=0)
+    l4d2_award_smoker = models.IntegerField(blank=True, default=0)
+    l4d2_award_left4dead = models.IntegerField(blank=True, default=0)
+    l4d2_award_letinsafehouse = models.IntegerField(blank=True, default=0)
     gmodzs_headshots = models.IntegerField(blank=True, default=0)
     gmodzs_playtime = models.IntegerField(blank=True, default=0)
     gmodzs_points = models.IntegerField(blank=True, default=0)
@@ -168,8 +173,6 @@ class UserStats(ExportModelOperationsMixin('userstats'), models.Model):
     gmodrp_playtime = models.IntegerField(blank=True, default=0)
     gmodrp_kills = models.IntegerField(blank=True, default=0)
     gmodrp_deaths = models.IntegerField(blank=True, default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta: 
         ordering = ["-total_points"]
