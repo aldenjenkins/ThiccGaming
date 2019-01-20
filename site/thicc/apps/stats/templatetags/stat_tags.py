@@ -34,22 +34,19 @@ def gravatar(context, email):
 def minutes_to_duration(context, minutes):
     if minutes != '':
         #seconds  = math.floor((new Date() - date)/1000),
-        interval = math.floor(int(minutes) / 31536000)
+        interval = math.floor(int(minutes) / 525600)
         #  console.log("seconds: " + seconds + " interval: " + interval)
         if interval >= 1:
             return str(interval) + " years"
-        interval = math.floor(minutes / 2592000)
+        interval = math.floor(minutes / 42800)
         if interval >= 1:
             return str(interval) + " months"
-        interval = math.floor(minutes / 86400)
+        interval = math.floor(minutes / 1440)
         if interval >= 1:
             return str(interval) + " days"
-        interval = math.floor(minutes / 3600)
-        if interval >= 1:
-            return str(interval) + " hours"
         interval = math.floor(minutes / 60)
         if interval >= 1:
-            return str(interval) + " minutes"
+            return str(interval) + " hours"
         return str(math.floor(minutes)) + " minutes"
     return ''
 
