@@ -71,6 +71,7 @@ class DonateView(FormView):
 
         return None
 
+
     def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
@@ -84,11 +85,10 @@ class DonateView(FormView):
             "business": settings.PAYPAL_RECEIVER_EMAIL,
             "item_name": "Donation",
             "invoice": str(steam)+":"+uuid.uuid4().hex,
-            "notify_url": "http://" + "localhost:8000/" + reverse('paypal-ipn'),
-            "return_url": "http://localhost:8000/donate",
-            "cancel_return": "http://localhost:8000/donate",
+            "notify_url": "http://" + domain + reverse('paypal-ipn'),
+            "return_url": "http://" + domain + "/donate",
+            "cancel_return": "http://" + domain + "/donate",
             "custom": steam,  # Custom command to correlate to some function later (optional)
         }
-
 
         return initial

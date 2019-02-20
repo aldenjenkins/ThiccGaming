@@ -514,6 +514,7 @@ DATABASES = {
 }
 
 PAYPAL_RECEIVER_EMAIL = os.getenv('PAYPAL_EMAIL', '')
+PAYPAL_TEST = False
 
 DONATION_AMOUNTS = (
     # Amount, Days of premium
