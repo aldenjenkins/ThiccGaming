@@ -9,6 +9,11 @@ class StatsListView(ListView):
     paginate_by = 30
     context_object_name = "stats_list"
 
+    def get_context_data(self, *args, **kwargs):
+        context_data = super().get_context_data(*args, **kwargs)
+        context_data['total_objects'] = UserStats.objects.count()
+        return context_data
+
     def get_queryset(self):
         query = self.request.GET.get('q')
         if query:

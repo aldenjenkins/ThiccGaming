@@ -1,5 +1,5 @@
 from django.db import models
-import valve.source.a2s
+import a2s
 
 SERVER_TYPES = (
     (68, 'Dedicated'),
@@ -37,45 +37,50 @@ class Server(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def update_info(self):
-        a2s = valve.source.a2s.ServerQuerier((self.host, self.port))
+        #a2s = valve.source.a2s.ServerQuerier((self.host, self.port))
         try:
-            info = a2s.get_info()
+            info = dict(a2s.info((self.host, self.port)))
             self.up = True
             self.save()
-        except valve.source.a2s.NoResponseError:
+        #except valve.source.a2s.NoResponseError:
+        except:
             self.up = False
             self.save()
             return False
         info_model = Info(server=self)
         info_model.server_name = info['server_name']
-        info_model.map = info['map']
+        info_model.map = info['map_name']
         info_model.folder = info['folder']
         info_model.game = info['game']
         info_model.app_id = info['app_id']
         info_model.player_count = info['player_count']
+        print('player_count' + info['player_count'])
         info_model.max_players = info['max_players']
         info_model.bot_count = info['bot_count']
-        info_model.server_type = info['server_type'].value
-        info_model.platform = info['platform'].value
+        info_model.server_type = info['server_type']
+        info_model.platform = info['platform']
         info_model.password_protected = info['password_protected']
         info_model.vac_enabled = info['vac_enabled']
         info_model.version = info['version']
+        self.info_set.all().delete()
         info_model.save()
+        print("player_count" + info_model.player_count)
         return True
 
     def update_players(self):
-        a2s = valve.source.a2s.ServerQuerier((self.host, self.port))
+        #a2s = valve.source.a2s.ServerQuerier((self.host, self.port))
         try:
-            players = a2s.get_players()
+            players = a2s.players((self.host, self.port))
             self.up = True
             self.save()
-        except valve.source.a2s.NoResponseError:
+        except:
             self.up = False
             self.save()
             return False
 
         player_models = []
-        for player in players['players']:
+        for player in players:
+            player = dict(player)
             player_models.append(Player(
                 server=self,
                 name=player['name'],
@@ -87,18 +92,19 @@ class Server(models.Model):
         return True
 
     def update_rules(self):
-        a2s = valve.source.a2s.ServerQuerier((self.host, self.port))
+        #a2s = valve.source.a2s.ServerQuerier((self.host, self.port))
         try:
-            rules = a2s.get_rules()
+            rules = a2s.rules((self.host, self.port))
             self.up = True
             self.save()
-        except valve.source.a2s.NoResponseError:
+        #except valve.source.a2s.NoResponseError:
+        except:
             self.up = False
             self.save()
             return False
 
         rule_models = []
-        for cvar, value in rules['rules'].items():
+        for cvar, value in rules.items():
             rule_models.append(Rule(
                 server=self,
                 cvar=cvar,

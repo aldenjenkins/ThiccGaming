@@ -22,94 +22,12 @@
             {% if forum_settings.PM_SUPPORT and user.is_authenticated %}<a class="btn" href="{% url 'messages_compose_to' profile %}"><i style="font-size:inherit;" class="fa fa-fw fa-envelope"></i> {% trans "Send Private Message" %}</a>{% endif %}
         </div>
     </div>
-    <div class="content-container">
-    	<h3>{% trans "Personal" %}</h3>
-    	<dl class="styled-dl">
-    		<dt><strong>{% trans "Real name:" %}</strong></dt>
-    		<dd>
-    			{% if profile.first_name or profile.last_name %}
-					{{ profile.first_name }} {{ profile.last_name }}
-				{% else %}
-					{% trans "(Not Set)" %}
-				{% endif %}
-			</dd>
-    		<dt><strong>{% trans "Location:" %}</strong></dt>
-    		<dd>
-				{% if profile.forum_profile.location %}
-					{{ profile.forum_profile.location }}
-				{% else %}
-					{% trans "(Not Set)" %}
-				{% endif %}
-			</dd>
-			<dt><strong>{% trans "Website:" %}</strong></dt>
-			<dd>
-				{% if profile.forum_profile.site %}
-					{{ profile.forum_profile.site|urlize }}
-				{% else %}
-					{% trans "(Not Set)" %}
-				{% endif %}
-			</dd>
-			{% if forum_settings.USER_TO_USER_EMAIL %}
-				<dt><strong>{% trans "E-mail:" %}</strong></dt>
-				<dd>
-					{% if profile.forum_profile.privacy_permission == 0 %}
-						<a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
-					{% else %}
-						{% if profile.forum_profile.privacy_permission == 1 %}
-							<a href="{% url 'djangobb:misc' %}?mail_to={{ profile }}">{% trans "Send e-mail" %}</a>
-						{% else %}
-							{% trans "(Hidden)" %}
-						{% endif %}
-					{% endif %}
-				</dd>
-			{% endif %}
-            <dd style="width:100%;"><a href="http://steamcommunity.com/profiles/{{ profile.social_auth }}"><strong>{% trans "Steam Community Profile" %}</strong></a></dd>
-    	</dl>
-    </div>
-    <div class="content-container">
-    	<h3>{% trans "Personality" %}</h3>
-    	<dl class="styled-dl">
-    		<dt class="full-width"><strong>{% trans "Forum Signature:" %}</strong></dt>
-    		<dd class="full-width">
-				{% if profile.forum_profile.signature_html %}
-					<div class="forum-sig-box">{{ profile.forum_profile.signature_html|safe }}</div>
-				{% else %}
-					{% trans "Not set." %}
-				{% endif %}
-			</dd>
-		</dl>
-    </div>
-    <div class="content-container">
-    	<h3>{% trans "User activity" %}</h3>
-     	<dl class="styled-dl">
-    		<dt><strong>{% trans "Reputation:" %}</strong></dt>
-    		<dd>
-				<span class="green-text"><i class="fa fa-thumbs-up"></i> {{ profile.forum_profile.reply_count_plus|default_if_none:"0" }}</span>&nbsp;&nbsp;&nbsp;
-				<span class="red-text"><i class="fa fa-thumbs-down"></i> {{ profile.forum_profile.reply_count_minus|default_if_none:"0" }}</span>&nbsp;
-				- <a href="{% url 'djangobb:reputation' profile %}">{% trans "View Reputation" %}</a>
-			</dd>
-    		<dt><strong>{% trans "Posts:" %}</strong></dt>
-    		<dd>
-				{{ profile.forum_profile.post_count }} - <a href="{% url 'djangobb:search' %}?action=show_user&amp;user_id={{ profile.id }}">{% trans "Show all posts" %}</a>
-			</dd>
-			{% if profile.forum_profile.last_post %}
-	    		<dt><strong>{% trans "Last post:" %}</strong></dt>
-	    		<dd>
-					{{ profile.forum_profile.last_post }}
-				</dd>
-			{% endif %}
-    		<dt><strong>{% trans "Registered:" %}</strong></dt>
-    		<dd>
-				{{ profile.date_joined|date:"M. j, Y" }}
-			</dd>
-		</dl>
-    </div>
-{% with stat=profile.user.social_auth.first.my_stats_object %}
+{% with stat=profile.social_auth.first.my_stats_object %}
     <div class="content-container">
     	<h3>{% trans "Game Stats" %}</h3>
 <table class="ban-table">
     <tr class ="row table-header">
-        <th>Overall Rank</th>
+      <th>Overall Rank</th>
         <th>User</th>
         <th>Total Points</th>
         <th>Play Time</th>
@@ -118,7 +36,7 @@
         <tr class = "ban-row" style="cursor:pointer;">
             <td>
                 {# Rank #}
-                <b>{{ stat.total_points }}</b>
+                <b>{{ stat.overall_rank }}</b>
             </td>
             <td>
                 {# User & Photo #}
@@ -144,10 +62,10 @@
                 {{ stat.total_points }}
             </td>
             <td>
-                {% seconds_to_duration stat.total_playtime %}
+                {% minutes_to_duration stat.total_playtime %}
             </td>
             <td>
-                {% age_from_char_epoch stat.last_online %} ago
+                {% age_from_char_epoch stat.last_online %}
             </td>
         </tr>
         <tr class="ban-info" style="display:none">
@@ -205,7 +123,7 @@
                                                <tr align="left">
                                                    <td width="30%">Play Time</td>
                                                    <td>
-                                                       {% seconds_to_duration stat.l4d2_playtime %}
+                                                       {% minutes_to_duration stat.l4d2_playtime %}
                                                    </td>
                                                </tr>
                                                {% for key, attribute in stat.l4d2_stats.items %}
@@ -234,7 +152,7 @@
                                                <tr align="left">
                                                    <td width="30%">Play Time</td>
                                                    <td>
-                                                       {% seconds_to_duration stat.gmodzs_playtime %}
+                                                       {% minutes_to_duration stat.gmodzs_playtime %}
                                                    </td>
                                                </tr>
                                                {% for key, attribute in stat.gmodzs_stats.items %}
@@ -258,4 +176,109 @@
 </table>
     </div>
     {% endwith %}
+    <div class="content-container">
+    	<h3>{% trans "Personal" %}</h3>
+    	<dl class="styled-dl">
+    		<dt><strong>{% trans "Real name:" %}</strong></dt>
+    		<dd>
+    			{% if profile.first_name or profile.last_name %}
+					{{ profile.first_name }} {{ profile.last_name }}
+				{% else %}
+					{% trans "(Not Set)" %}
+				{% endif %}
+			</dd>
+    		<dt><strong>{% trans "Location:" %}</strong></dt>
+    		<dd>
+				{% if profile.forum_profile.location %}
+					{{ profile.forum_profile.location }}
+				{% else %}
+					{% trans "(Not Set)" %}
+				{% endif %}
+			</dd>
+			<dt><strong>{% trans "Website:" %}</strong></dt>
+			<dd>
+				{% if profile.forum_profile.site %}
+					{{ profile.forum_profile.site|urlize }}
+				{% else %}
+					{% trans "(Not Set)" %}
+				{% endif %}
+			</dd>
+			{% if forum_settings.USER_TO_USER_EMAIL %}
+				<dt><strong>{% trans "E-mail:" %}</strong></dt>
+				<dd>
+					{% if profile.forum_profile.privacy_permission == 0 %}
+						<a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+					{% else %}
+						{% if profile.forum_profile.privacy_permission == 1 %}
+							<a href="{% url 'djangobb:misc' %}?mail_to={{ profile }}">{% trans "Send e-mail" %}</a>
+						{% else %}
+							{% trans "(Hidden)" %}
+						{% endif %}
+					{% endif %}
+				</dd>
+			{% endif %}
+            <dd style="width:100%;"><a href="http://steamcommunity.com/profiles/{{ profile.social_auth.first.uid }}"><strong>{% trans "Steam Community Profile" %}</strong></a></dd>
+    	</dl>
+    </div>
+    <div class="content-container">
+    	<h3>{% trans "Personality" %}</h3>
+    	<dl class="styled-dl">
+    		<dt class="full-width"><strong>{% trans "Forum Signature:" %}</strong></dt>
+    		<dd class="full-width">
+				{% if profile.forum_profile.signature_html %}
+					<div class="forum-sig-box">{{ profile.forum_profile.signature_html|safe }}</div>
+				{% else %}
+					{% trans "Not set." %}
+				{% endif %}
+			</dd>
+		</dl>
+    </div>
+    <div class="content-container">
+    	<h3>{% trans "User activity" %}</h3>
+     	<dl class="styled-dl">
+    		<dt><strong>{% trans "Reputation:" %}</strong></dt>
+    		<dd>
+				<span class="green-text"><i class="fa fa-thumbs-up"></i> {{ profile.forum_profile.reply_count_plus|default_if_none:"0" }}</span>&nbsp;&nbsp;&nbsp;
+				<span class="red-text"><i class="fa fa-thumbs-down"></i> {{ profile.forum_profile.reply_count_minus|default_if_none:"0" }}</span>&nbsp;
+				- <a href="{% url 'djangobb:reputation' profile %}">{% trans "View Reputation" %}</a>
+			</dd>
+    		<dt><strong>{% trans "Posts:" %}</strong></dt>
+    		<dd>
+				{{ profile.forum_profile.post_count }} - <a href="{% url 'djangobb:search' %}?action=show_user&amp;user_id={{ profile.id }}">{% trans "Show all posts" %}</a>
+			</dd>
+			{% if profile.forum_profile.last_post %}
+	    		<dt><strong>{% trans "Last post:" %}</strong></dt>
+	    		<dd>
+					{{ profile.forum_profile.last_post }}
+				</dd>
+			{% endif %}
+    		<dt><strong>{% trans "Registered:" %}</strong></dt>
+    		<dd>
+				{{ profile.date_joined|date:"M. j, Y" }}
+			</dd>
+		</dl>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        $(document).ready(function(){
+            $(".ban-row").click(function(){
+                $(this).next().toggle('fast');
+
+            });
+            $(".controlpanel").click(function(){
+                $(this).next(".openme").toggle('fast');
+            });
+
+        });
+    </script>
+{#    {% if user.is_authenticated and user.is_superuser %}#}
+{#    <script>#}
+{#        $(document).ready(function(){#}
+{#            $("#unban").click(function(){#}
+{#                $(this).next().toggle('fast');#}
+{#            });#}
+{#        });#}
+{#    </script>#}
+{#{% endif %}#}
 {% endblock %}

@@ -16,7 +16,7 @@
                         <div class="server-info">
                             <div class="server-info-name"><a href="steam://connect/{{ server.host }}:{{ server.port }}" rel="nofollow" data-tooltip="{% trans 'Connect to this server' %}">{{ server.title|default:'Unknown' }}</a></div>
                             <div class="server-info-map">{{ server.info.map|default:'Unknown' }}</div>
-                            <div class="server-info-players">{{ server.info.player_count }} / {{ server.info.max_players|default:'0' }}</div>
+                            <div class="server-info-players">{{ server.player_set.count }} / {{ server.info.max_players|default:'0' }}</div>
                         </div>
                     {#{% endif %}#}
                 {% else %}

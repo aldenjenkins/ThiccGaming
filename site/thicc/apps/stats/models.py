@@ -191,6 +191,11 @@ class UserStats(ExportModelOperationsMixin('userstats'), models.Model):
         steamid.append(str(steamidacct // 2))
         return ''.join(steamid)
 
+    @property
+    def overall_rank(self):
+        return UserStats.objects.filter(total_points__gt=self.total_points).count() + 1
+
+
     def l4d2_stats(self):
         return {
             "Points": self.l4d2_points,

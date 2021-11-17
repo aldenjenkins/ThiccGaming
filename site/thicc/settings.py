@@ -346,7 +346,7 @@ INSTALLED_APPS = (
     'storages',
     'django_celery_beat',
     #'silk',
-    'django_prometheus',
+    #'django_prometheus',
 )
 
 apps = INSTALLED_APPS

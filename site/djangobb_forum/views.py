@@ -608,9 +608,9 @@ def user(request, username, section='essentials', action=None, template='djangob
     else:
         template = 'djangobb_forum/user.html'
         topic_count = Topic.objects.filter(user__id=user.id).count()
-        if user.forum_profile.post_count < forum_settings.POST_USER_SEARCH and not request.user.is_authenticated():
-            messages.error(request, _("Please sign in."))
-            return HttpResponseRedirect(settings.LOGIN_URL + '?next=%s' % request.path)
+        #if user.forum_profile.post_count < forum_settings.POST_USER_SEARCH and not request.user.is_authenticated():
+        #    messages.error(request, _("Please sign in."))
+        #    return HttpResponseRedirect(settings.LOGIN_URL + '?next=%s' % request.path)
         return render(request, template, {'profile': user,
                 'topic_count': topic_count,
                })

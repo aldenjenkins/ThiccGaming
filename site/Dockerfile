@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.7
 
 RUN mkdir -p /opt/services/thiccsite/src
 WORKDIR /opt/services/thiccsite/src
@@ -6,7 +6,7 @@ WORKDIR /opt/services/thiccsite/src
 #COPY Pipfile Pipfile.lock /opt/services/thiccsite/src/
 COPY requirements.txt /opt/services/thiccsite/src/
 #RUN pip install pipenv && pipenv install --system
-RUN pip install -r requirements.txt
+RUN pip --use-deprecated=legacy-resolver install -r requirements.txt
 
 COPY . /opt/services/thiccsite/src
 
